@@ -1,11 +1,11 @@
 import json
 from pydoc import describe
 
+inventory = []
+
 f = open("room_example.json", "r")
 
 data = json.load(f)
-
-print(data["name"])
 
 print(f"you enter {data['name']} room")
 print(f"you enter a {data['description']}")
@@ -23,16 +23,25 @@ def input_handler(dataset, message="> "):
     if input_command == "exit":
         exit()
         
+    if input_command == "back":
+        pass
+
     if input_command == "help":
         print("available commands: ")
         print(" - exit")
         print(" - help")
         # print(" - inspect")
         input_handler(dataset=dataset)
+
+    if input_command in ["take", "grab"]:
+        inventory.append(dataset)
+        name = dataset["name"]
+        article = "an" if name[0] in "aeiou" else "a"
+        print(f"You have aquired {article} {name}")
     
     # approach
-    if input_command in dataset:
-        approach(dataset[input_command])
+    if input_command in dataset["poi"]:
+        approach(dataset["poi"][input_command])
 
     # if input_command == "inspect":
     #     desc = dataset["description"]
@@ -59,9 +68,11 @@ def approach(dataset):
             print(f"{article} {item}, ", end="")
         
         print("what item would you like to inspect?")
-        input_handler(dataset=dataset["poi"])
+        input_handler(dataset=dataset)
 
     else:
+        print("What would you like to do?")
+        input_handler(dataset=dataset);
         print("there are no items here")
 
 
@@ -76,7 +87,7 @@ if "poi" in data:
         print(f"{article} {item}, ", end="")
         
     print("what item would you like to inspect?")
-    input_handler(dataset=data["poi"])
+    input_handler(dataset=data)
 
 else:
     print("there are no items in this room")

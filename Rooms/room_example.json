@@ -1,5 +1,5 @@
 {
-    "name": "example",
+    "name": "jungle",
     "id": "1234567890",
     "url": "https://example.com/room/1234567890",
     "description": "jungle forest with tall trees and running water",
@@ -19,13 +19,13 @@
                     "class": "container",
                     "poi": {
                         "key": {
-                            "name": "special key",
+                            "name": "Jade Key",
                             "description": "a small jade key",
                             "class": "collectable",
                             "rarity": 10
                         },
                         "gold": {
-                            "name": "gold",
+                            "name": "Small Pile of Gold",
                             "description": "a small pile of gold",
                             "class": "collectable",
                             "rarity": 5,
