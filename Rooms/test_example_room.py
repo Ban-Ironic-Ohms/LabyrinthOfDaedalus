@@ -15,7 +15,27 @@ if len(data["poi"]["doors"]) > 0:
     for door in data["poi"]["doors"]:
         print(f" - {door}")
 
-        
+def input_handler(message="> ", dataset=data):
+    input_command = input(message)
+    input_command = input_command.lower()
+    
+    if input_command == "exit":
+        exit()
+    
+    if input_command in dataset:
+        pass
+    # if input_command == "approach":
+    #     return "approach"
+    if input_command == "inspect":
+        desc = dataset["description"]
+        print(desc)
+    if input_command == "inventory":
+        print("inventory")
+    else:
+        return input_command
+
+
+
 def approach(dataset):
     print(dataset["description"])
     
@@ -30,6 +50,7 @@ def approach(dataset):
             print(f"{article} {item}, ", end="")
         
         print("what item would you like to inspect?")
+        # input_item = input_handler(dataset=dataset)
         input_item = input("> ")
         
         if input_item in dataset["items"]:
@@ -52,6 +73,8 @@ if "items"  in data["poi"]:
         print(f"{article} {item}, ", end="")
         
     print("what item would you like to inspect?")
+    # input_item = input_handler()
+    # input_item = input_handler(dataset=data["poi"])
     input_item = input("> ")
     
     if input_item in data["poi"]["items"]:
