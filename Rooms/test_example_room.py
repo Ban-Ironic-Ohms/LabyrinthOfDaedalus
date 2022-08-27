@@ -10,39 +10,48 @@ print(data["name"])
 print(f"you enter {data['name']} room")
 print(f"you enter a {data['description']}")
 
-if len(data["poi"]["doors"]) > 0:
+if len(data["doors"]) > 0:
     print("you see doors:")
-    for door in data["poi"]["doors"]:
+    for door in data["doors"]:
         print(f" - {door}")
 
-def input_handler(message="> ", dataset=data):
+def input_handler(dataset, message="> "):
     input_command = input(message)
     input_command = input_command.lower()
     
+    # misc commands
     if input_command == "exit":
         exit()
+        
+    if input_command == "help":
+        print("available commands: ")
+        print(" - exit")
+        print(" - help")
+        # print(" - inspect")
+        input_handler(dataset=dataset)
     
+    # approach
     if input_command in dataset:
-        pass
-    # if input_command == "approach":
-    #     return "approach"
-    if input_command == "inspect":
-        desc = dataset["description"]
-        print(desc)
-    if input_command == "inventory":
-        print("inventory")
+        approach(dataset[input_command])
+
+    # if input_command == "inspect":
+    #     desc = dataset["description"]
+    #     print(desc)
+        
+    # if input_command == "inventory":
+    #     print("inventory")
+        
     else:
-        return input_command
-
-
-
+        print('invalid command - type "help" for a list of commands')
+        input_handler(dataset=dataset)
+        
 def approach(dataset):
     print(dataset["description"])
     
-    if "items" in dataset:
+    if "poi" in dataset:
         print("you see ", end="")
-        length = len(dataset["items"])
-        for ind, item in enumerate(dataset["items"]):
+        length = len(dataset["poi"])
+        for ind, item in enumerate(dataset["poi"]):
             article = "an" if item[0] in "aeiou" else "a"
             if ind == length - 1 and length > 1:
                 print(f"and {article} {item}.")
@@ -50,22 +59,16 @@ def approach(dataset):
             print(f"{article} {item}, ", end="")
         
         print("what item would you like to inspect?")
-        # input_item = input_handler(dataset=dataset)
-        input_item = input("> ")
-        
-        if input_item in dataset["items"]:
-            # print(dataset)
-            approach(dataset["items"][input_item])
-        else:
-            print("item not found")
+        input_handler(dataset=dataset["poi"])
+
     else:
         print("there are no items here")
 
 
-if "items"  in data["poi"]:
+if "poi" in data:
     print("you see ", end="")
-    length = len(data["poi"]["items"])
-    for ind, item in enumerate(data["poi"]["items"]):
+    length = len(data["poi"])
+    for ind, item in enumerate(data["poi"]):
         article = "an" if item[0] in "aeiou" else "a"
         if ind == length - 1 and length > 1:
             print(f"and {article} {item}.")
@@ -73,13 +76,7 @@ if "items"  in data["poi"]:
         print(f"{article} {item}, ", end="")
         
     print("what item would you like to inspect?")
-    # input_item = input_handler()
-    # input_item = input_handler(dataset=data["poi"])
-    input_item = input("> ")
-    
-    if input_item in data["poi"]["items"]:
-        approach(data["poi"]["items"][input_item])
-    else:
-        print("item not found")
+    input_handler(dataset=data["poi"])
+
 else:
     print("there are no items in this room")
