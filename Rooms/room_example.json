@@ -1,5 +1,5 @@
 {
-    "name": "example room",
+    "name": "example",
     "id": "1234567890",
     "url": "https://example.com/room/1234567890",
     "description": "jungle forest with tall trees and running water",
@@ -12,9 +12,43 @@
             "waterfall": {
                 "name": "waterfall",
                 "description": "a waterfall cascades down the cliff face",
-                
-
+                "class": "container",
+                "items": {
+                    "chest": {
+                        "name": "chest",
+                        "description": "a wooden chest with a lock",
+                        "class": "container",
+                        "items": {
+                            "key": {
+                                "name": "special key",
+                                "description": "a small jade key",
+                                "class": "collectable",
+                                "rarity": 10
+                            },
+                            "gold": {
+                                "name": "gold",
+                                "description": "a small pile of gold",
+                                "class": "collectable",
+                                "rarity": 5,
+                                "value": 10
+                            }
+                        }
+                    }
+                }
+            },
+            "key": {
+                "name": "common key",
+                "description": "a key made of gold sitting on the ground",
+                "class": "collectable",
+                "rarity": 1
+            },
+            "potion": {
+                "name": "healing potion",
+                "description": "a potion of healing",
+                "class": "collectable",
+                "rarity": 9,
+                "effect": "heal"
             }
-        },
+        }
     }
 }
