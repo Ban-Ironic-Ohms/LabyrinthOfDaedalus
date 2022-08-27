@@ -1,4 +1,5 @@
 import json
+from pydoc import describe
 
 f = open("room_example.json", "r")
 
@@ -15,10 +16,10 @@ if len(data["poi"]["doors"]) > 0:
         print(f" - {door}")
 
         
-def approach(approach, dataset):
-    print(f"you approach {approach}")
+def approach(dataset):
+    print(dataset["description"])
     
-    if len(dataset["items"]) > 0:
+    if "items" in dataset:
         print("you see ", end="")
         length = len(dataset["items"])
         for ind, item in enumerate(dataset["items"]):
@@ -28,16 +29,19 @@ def approach(approach, dataset):
                 break
             print(f"{article} {item}, ", end="")
         
-        print("what item would you like to move to?")
+        print("what item would you like to inspect?")
         input_item = input("> ")
         
         if input_item in dataset["items"]:
-            approach(input_item, dataset["items"][input_item])
+            # print(dataset)
+            approach(dataset["items"][input_item])
         else:
-            print("item not found")            
+            print("item not found")
+    else:
+        print("there are no items here")
 
 
-if len(data["poi"]["items"]) > 0:
+if "items"  in data["poi"]:
     print("you see ", end="")
     length = len(data["poi"]["items"])
     for ind, item in enumerate(data["poi"]["items"]):
@@ -47,11 +51,12 @@ if len(data["poi"]["items"]) > 0:
             break
         print(f"{article} {item}, ", end="")
         
-    print("what item would you like to move to?")
+    print("what item would you like to inspect?")
     input_item = input("> ")
     
     if input_item in data["poi"]["items"]:
-        approach(input_item, data["poi"]["items"][input_item])
+        approach(data["poi"]["items"][input_item])
     else:
         print("item not found")
-            
+else:
+    print("there are no items in this room")
