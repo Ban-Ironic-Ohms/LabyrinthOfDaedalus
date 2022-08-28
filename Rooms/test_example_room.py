@@ -7,23 +7,13 @@ data = json.load(f)
 f_pd = open("player_data.json", "r")
 player_data = json.load(f_pd)
 
-# print(f"you enter {data['name']} room")
-# print(f"you enter a {data['description']}")
-
-# if len(data["doors"]) > 0:
-#     print("you see doors:")
-#     for door in data["doors"]:
-#         print(f" - {door}")
-
-# todo doors
-
 def article(string):
     return "an" if string[0] in "aeiou" else "a"
 
 def discribe_poi(dataset):
-    if dataset["class"] == "room":
+    if "room" in dataset["class"]:
         print(f"you enter {data['name']} room")
-        print(f"you enter a {data['description']}")
+        print(f"you enter a {dataset['descriptions']['main_description']}")
 
         if len(data["doors"]) > 0:
             print("you see doors:")
@@ -33,11 +23,11 @@ def discribe_poi(dataset):
         print_pois(dataset=dataset)
 
     elif "poi" in dataset:
-        print(dataset["description"])
+        print(dataset["descriptions"]["main_description"])
         print_pois(dataset=dataset)
 
     else:
-        print(dataset["description"])
+        print(dataset["descriptions"]["main_description"])
         print("What would you like to do?")
 
 
@@ -59,6 +49,7 @@ def print_pois(dataset):
         print("What would you like to look at?")
 
 def input_handler(dataset, message="> "):
+    print(player_data["cur_noise_level"])
     input_command = input(message)
     input_command = input_command.lower()
 
@@ -75,15 +66,18 @@ def input_handler(dataset, message="> "):
         exit()
         
     elif input_command == "back":
-        if dataset["class"] == "collectable":
+        increase_cur_noise_level(2)
+        if  "collectable" in dataset["class"]:
             return
         return "back"
 
     elif input_command in ["take", "grab"]:
+        increase_cur_noise_level(5)
         return add_item_to_inventory(dataset)
     
     # approach
     elif input_command in dataset["poi"]:
+        increase_cur_noise_level(2)
         return approach(dataset["poi"][input_command])
         
 
@@ -92,6 +86,7 @@ def input_handler(dataset, message="> "):
         return input_handler(dataset=dataset)
         
     elif input_command == "inventory":
+        increase_cur_noise_level(1)
         print("inventory")
         
     else:
@@ -122,7 +117,7 @@ def approach(dataset):
 
 def add_item_to_inventory(dataset):
     #check if you can take target item
-    if dataset["class"] != "collectable":
+    if "collectable" not in dataset["class"]:
         print(f"You can't put {article(dataset['name'])} {dataset['name']} in your inventory!")
         return None
     
@@ -139,25 +134,27 @@ def add_item_to_inventory(dataset):
 
     return dataset
 
-def combat():
+def increase_cur_noise_level(volume_increase):
+    player_data["cur_noise_level"] += volume_increase
+    with open("player_data.json", "w") as f:
+        json.dump(player_data, f)
+
+    for i in data["entities"]:
+        if (int(data["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"])):
+            combat(data["entities"][i])
+
+def change_player_stat():
     pass
 
-approach(data)
+def combat(enemy_data):
+    print(f"The {enemy_data['name']} noticed you. It attacks!")
 
+    if "ranged" in enemy_data["class"]:
+        print(f"With its range the {enemy_data['name']} gets a free attack on you. It {enemy_data['descriptions']['attack_description']}")
 
-
-# if "poi" in data:
-#     print("you see ", end="")
-#     length = len(data["poi"])
-#     for ind, item in enumerate(data["poi"]):
-#         article = "an" if item[0] in "aeiou" else "a"
-#         if ind == length - 1 and length > 1:
-#             print(f"and {article} {item}.")
-#             break
-#         print(f"{article} {item}, ", end="")
+    while True:
         
-#     print("what item would you like to inspect?")
-#     input_handler(dataset=data)
 
-# else:
-#     print("there are no items in this room")
+        break
+
+approach(data)

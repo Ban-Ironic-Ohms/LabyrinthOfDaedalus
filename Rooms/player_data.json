@@ -1,7 +1,8 @@
 {
-    "cur_noise_level": 0, 
+    "hp": 50,
+    "cur_noise_level": 11,
 
     "inventory": {
-        
+
     }
 }
