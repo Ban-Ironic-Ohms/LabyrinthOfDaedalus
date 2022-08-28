@@ -1,5 +1,6 @@
 import json
 from pydoc import describe
+from random import randint, randrange
 
 f = open("room_example.json", "r")
 data = json.load(f)
@@ -53,7 +54,7 @@ def input_handler(dataset, message="> "):
     input_command = input_command.lower()
 
     if "enemy" in dataset["class"]:
-        if input_command == "attack":
+        if input_command in ["attack", "fight"] :
             return "attack"
 
         elif input_command == "run":
@@ -160,7 +161,7 @@ def change_player_stat(stat_name, change_amount):
 
 
 def combat(enemy_data):
-    print(f"The {enemy_data['name']} noticed you. It attacks!")
+    print(f"The {enemy_data['name']} noticed you!")
 
     if "ranged" in enemy_data["class"]:
         print(f"With its range the {enemy_data['name']} gets a free attack on you. It {enemy_data['descriptions']['attack_description']}")
@@ -173,6 +174,12 @@ def combat(enemy_data):
         input_handler_return_value = input_handler(enemy_data)
         if input_handler_return_value == "attack":
             attack_enemy(enemy_data=enemy_data)
+        elif input_handler_return_value == "run":
+            if randint(1, 10) > 8:
+                print("You run away and manage to escape!")
+                exit()
+                break
+            print("You attempt to flee the room, but fail to escape!")
         
         if enemy_data["hp"] <= 0:
             print(f"{enemy_data['name']} has been defeated!")

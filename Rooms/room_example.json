@@ -18,7 +18,7 @@
                 "main_description": "An orb of green gelatinous substance with random objects stuck inside it.",
                 "attack_description": "hurls a glob of goo at you."
             },
-            "class": "enemy, container, ranged",
+            "class": "enemy, container, melee",
             "passive_perception": 15
         }
     },
