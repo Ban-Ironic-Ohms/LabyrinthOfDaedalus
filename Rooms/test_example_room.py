@@ -4,8 +4,10 @@ from pydoc import describe
 inventory = []
 
 f = open("room_example.json", "r")
+inv = open("inventory.json", "r")
 
 data = json.load(f)
+inventory = json.load(inv)
 
 print(f"you enter {data['name']} room")
 print(f"you enter a {data['description']}")
@@ -54,12 +56,14 @@ def input_handler(dataset, message="> "):
     # approach
     if input_command in dataset["poi"]:
         approach(dataset["poi"][input_command])
-    
         
     else:
         print('invalid command - type "help" for a list of commands')
         input_handler(dataset=dataset)
-        
+
+def remove_json_entry(dataset):
+
+
 def approach(dataset):
     print(dataset["description"])
     

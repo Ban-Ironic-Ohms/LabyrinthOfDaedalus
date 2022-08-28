@@ -1,0 +1,8 @@
+{
+    "test" : 10,
+    "fruit" : {
+        "orange" : 20,
+        "strawberry" : 2,
+        "apple" : 0
+    }
+}
