@@ -12,6 +12,8 @@
     "entities": {
         "slime": {
             "name": "Green Slime",
+            "hp": 10,
+            "dmg": 3,
             "descriptions": {
                 "main_description": "An orb of green gelatinous substance with random objects stuck inside it.",
                 "attack_description": "hurls a glob of goo at you."

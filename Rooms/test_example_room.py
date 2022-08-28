@@ -49,9 +49,19 @@ def print_pois(dataset):
         print("What would you like to look at?")
 
 def input_handler(dataset, message="> "):
-    print(player_data["cur_noise_level"])
     input_command = input(message)
     input_command = input_command.lower()
+
+    if "enemy" in dataset["class"]:
+        if input_command == "attack":
+            return "attack"
+
+        elif input_command == "run":
+            return "run"
+        
+        else:
+            print(f"You can't use {input_command} in combat")
+            return
 
     # misc commands
     if input_command == "help":
@@ -143,18 +153,35 @@ def increase_cur_noise_level(volume_increase):
         if (int(data["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"])):
             combat(data["entities"][i])
 
-def change_player_stat():
-    pass
+def change_player_stat(stat_name, change_amount):
+    player_data[stat_name] += change_amount
+    with open("player_data.json", "w") as f:
+        json.dump(player_data, f)
+
 
 def combat(enemy_data):
     print(f"The {enemy_data['name']} noticed you. It attacks!")
 
     if "ranged" in enemy_data["class"]:
         print(f"With its range the {enemy_data['name']} gets a free attack on you. It {enemy_data['descriptions']['attack_description']}")
+        change_player_stat("hp", -enemy_data["dmg"])
 
     while True:
-        
+        print("What do you do?")
+        input_handler_return_value = input_handler(enemy_data)
+        if input_handler_return_value == "attack":
+            attack_enemy(enemy_data=enemy_data)
+            
+        if enemy_data["hp"] <= 0:
+            print(f"{enemy_data['name']} has been defeated!")
+            break
 
-        break
+def attack_enemy(enemy_data):
+    print(player_data["descriptions"]["attack_description"])
+    enemy_data["hp"] -= player_data["dmg"]
+    with open("data.json", "w") as f:
+        json.dump(data, f)
+    print(f"You hit and deal {player_data['dmg']} to the {enemy_data['name']}.")
+    print(f"It has {enemy_data['hp']} hp left. ({enemy_data['hp'] + player_data['dmg']} - {player_data['dmg']})")
 
 approach(data)
