@@ -9,8 +9,6 @@ data = json.load(f)
 inv = open("inventory.json", "r")
 inventory = json.load(inv)
 
-
-
 print(f"you enter {data['name']} room")
 print(f"you enter a {data['description']}")
 
@@ -62,14 +60,18 @@ def input_handler(dataset, message="> "):
         # add to inventory
         inventory[name] = dataset
         
+        # remove from room
+        # TODO
+        
         with open("inventory.json", "w") as f:
             json.dump(inventory, f)
-        
+
         return "back"
     
     # approach
     elif input_command in dataset["poi"]:
         approach(dataset["poi"][input_command])
+        
 
     elif input_command == "inspect":
         desc = dataset["description"]
@@ -87,8 +89,6 @@ def input_handler(dataset, message="> "):
         input_handler(dataset=dataset)
 
 
-def remove_json_entry(dataset):
-    pass
 
 def approach(dataset):
     print(dataset["description"])
@@ -106,10 +106,14 @@ def approach(dataset):
             
             print("what item would you like to inspect?")
             if input_handler(dataset=dataset) == "back":
-                break;
+                break
     else:
         print("What would you like to do?")
-        input_handler(dataset=dataset)
+        if input_handler(dataset=dataset) == "back":
+            # rmv from room
+            print("you juyst trued to remoce something form hteroom")
+            print(dataset)
+            return "back"
 
 
 if "poi" in data:
