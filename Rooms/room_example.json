@@ -1,6 +1,7 @@
 {
     "name": "jungle",
     "id": "1234567890",
+    "class": "room",
     "url": "https://example.com/room/1234567890",
     "description": "jungle forest with tall trees and running water",
     "door": "mossy stone with obsidian handle",
