@@ -74,7 +74,7 @@ def input_handler(dataset, message="> "):
         print('invalid command - type "help" for a list of commands')
         input_handler(dataset=dataset)
 
-def remove_json_entry(dataset):
+# def remove_json_entry(dataset):
 
 
 def approach(dataset):
