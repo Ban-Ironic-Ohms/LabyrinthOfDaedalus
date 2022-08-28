@@ -1,34 +1,62 @@
 import json
 from pydoc import describe
 
-inventory = []
-
 f = open("room_example.json", "r")
 data = json.load(f)
 
-inv = open("inventory.json", "r")
-inventory = json.load(inv)
+f_pd = open("player_data.json", "r")
+player_data = json.load(f_pd)
 
-print(f"you enter {data['name']} room")
-print(f"you enter a {data['description']}")
+# print(f"you enter {data['name']} room")
+# print(f"you enter a {data['description']}")
 
-if len(data["doors"]) > 0:
-    print("you see doors:")
-    for door in data["doors"]:
-        print(f" - {door}")
+# if len(data["doors"]) > 0:
+#     print("you see doors:")
+#     for door in data["doors"]:
+#         print(f" - {door}")
 
 # todo doors
 
-def get_poi(dataset):
-    if "poi" in dataset:
-        print("you see ", end="")
-        length = len(dataset["poi"])
-        for ind, item in enumerate(dataset["poi"]):
-            if ind == length - 1 and length > 1:
-                print(f"and {article(item)} {item}.")
-                break
-            print(f"{article(item)} {item}, ", end="")
-        print("what item would you like to inspect?")
+def article(string):
+    return "an" if string[0] in "aeiou" else "a"
+
+def discribe_poi(dataset):
+    if dataset["class"] == "room":
+        print(f"you enter {data['name']} room")
+        print(f"you enter a {data['description']}")
+
+        if len(data["doors"]) > 0:
+            print("you see doors:")
+            for door in data["doors"]:
+                print(f" - {door}")
+        
+        print_pois(dataset=dataset)
+
+    elif "poi" in dataset:
+        print(dataset["description"])
+        print_pois(dataset=dataset)
+
+    else:
+        print(dataset["description"])
+        print("What would you like to do?")
+
+
+def print_pois(dataset):
+    print("You see ", end="")
+    length = len(dataset["poi"])
+    for ind, item in enumerate(dataset["poi"]):
+        if ind == length - 1 and length > 1:
+            print(f"and {article(item)} {item}.")
+            break
+        if length == 1:
+            print(f"{article(item)} {item}. ", end="")
+            break
+        print(f"{article(item)} {item}, ", end="")
+
+    if length == 1:
+        print("What would you like to do?")
+    else:
+        print("What would you like to look at?")
 
 def input_handler(dataset, message="> "):
     input_command = input(message)
@@ -40,6 +68,8 @@ def input_handler(dataset, message="> "):
         exit()
         
     elif input_command == "back":
+        if dataset["class"] == "collectable":
+            return
         return "back"
 
     elif input_command == "help":
@@ -51,23 +81,7 @@ def input_handler(dataset, message="> "):
         input_handler(dataset=dataset)
 
     elif input_command in ["take", "grab"]:
-        # inventory.append(dataset)
-        if dataset["class"] != "collectable":
-            print(f"You can't put {article(dataset['name'])} {dataset['name']} in your inventory!")
-            return
-        name = dataset["name"]
-        print(f"You have aquired {article(name)} {name}")
-        
-        # add to inventory
-        inventory[name] = dataset
-        
-        # remove from room
-        # TODO
-        
-        with open("inventory.json", "w") as f:
-            json.dump(inventory, f)
-
-        return dataset
+        return add_item_to_inventory(dataset)
     
     # approach
     elif input_command in dataset["poi"]:
@@ -75,11 +89,7 @@ def input_handler(dataset, message="> "):
         
 
     elif input_command == "inspect":
-        desc = dataset["description"]
-        print(f"you see {desc}")
-        
-        get_poi(dataset)
-       
+        discribe_poi(dataset)
         return input_handler(dataset=dataset)
         
     elif input_command == "inventory":
@@ -90,22 +100,10 @@ def input_handler(dataset, message="> "):
         input_handler(dataset=dataset)
 
 
-def article(string):
-    return "an" if string[0] in "aeiou" else "a"
-
 def approach(dataset):
-    print(dataset["description"])
-    
     if "poi" in dataset:
         while True: 
-            print("you see ", end="")
-            length = len(dataset["poi"])
-            for ind, item in enumerate(dataset["poi"]):
-                if ind == length - 1 and length > 1:
-                    print(f"and {article(item)} {item}.")
-                    break
-                print(f"{article(item)} {item}, ", end="")
-            print("what item would you like to inspect?")
+            discribe_poi(dataset=dataset)
             input_handler_return_value = input_handler(dataset=dataset)
             if input_handler_return_value == "back":
                 break
@@ -118,11 +116,35 @@ def approach(dataset):
                 with open("room_example.json", "w") as f:
                     json.dump(data, f)
     else:
-        print("What would you like to do?")
+        discribe_poi(dataset=dataset)
         return input_handler(dataset=dataset)
 
 
+def add_item_to_inventory(dataset):
+    #check if you can take target item
+    if dataset["class"] != "collectable":
+        print(f"You can't put {article(dataset['name'])} {dataset['name']} in your inventory!")
+        return None
+    
+    #tell player they got the item
+    name = dataset["name"]
+    print(f"You have aquired {article(name)} {name}")
+    
+    # add to inventory
+    player_data["inventory"][name] = dataset
+    
+    # save to player data file
+    with open("player_data.json", "w") as f:
+        json.dump(player_data, f)
+
+    return dataset
+
+def combat():
+    pass
+
 approach(data)
+
+
 
 # if "poi" in data:
 #     print("you see ", end="")
