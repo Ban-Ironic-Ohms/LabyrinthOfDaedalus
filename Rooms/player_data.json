@@ -1,1 +1,13 @@
-{"hp": 44, "dmg": 3, "cur_noise_level": 17, "descriptions": {"attack_description": "You swing yout fists at the enemy."}, "inventory": {}}
+{
+    "hp": 50,
+    "dmg": 3,
+    "cur_noise_level": 11,
+
+    "descriptions": {
+        "attack_description": "You swing yout fists at the enemy."
+    },
+
+    "inventory": {
+
+    }
+}

@@ -165,21 +165,28 @@ def combat(enemy_data):
     if "ranged" in enemy_data["class"]:
         print(f"With its range the {enemy_data['name']} gets a free attack on you. It {enemy_data['descriptions']['attack_description']}")
         change_player_stat("hp", -enemy_data["dmg"])
+        print(f"It hits and deals you {enemy_data['dmg']} hp")
+        print(f"It has {player_data['hp']} hp left. ({player_data['hp'] + enemy_data['dmg']} - {enemy_data['dmg']})")
 
     while True:
         print("What do you do?")
         input_handler_return_value = input_handler(enemy_data)
         if input_handler_return_value == "attack":
             attack_enemy(enemy_data=enemy_data)
-            
+        
         if enemy_data["hp"] <= 0:
             print(f"{enemy_data['name']} has been defeated!")
             break
 
+        print(f"\nthe {enemy_data['name']} attacks. It {enemy_data['descriptions']['attack_description']}")
+        change_player_stat("hp", -enemy_data["dmg"])
+        print(f"It hits and deals you {enemy_data['dmg']} hp")
+        print(f"You have {player_data['hp']} hp left. ({player_data['hp'] + enemy_data['dmg']} - {enemy_data['dmg']})")
+
 def attack_enemy(enemy_data):
     print(player_data["descriptions"]["attack_description"])
     enemy_data["hp"] -= player_data["dmg"]
-    with open("data.json", "w") as f:
+    with open("room_example.json", "w") as f:
         json.dump(data, f)
     print(f"You hit and deal {player_data['dmg']} to the {enemy_data['name']}.")
     print(f"It has {enemy_data['hp']} hp left. ({enemy_data['hp'] + player_data['dmg']} - {player_data['dmg']})")
