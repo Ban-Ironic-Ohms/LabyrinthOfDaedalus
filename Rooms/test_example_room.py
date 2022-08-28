@@ -62,23 +62,22 @@ def input_handler(dataset, message="> "):
     input_command = input(message)
     input_command = input_command.lower()
 
-        
     # misc commands
-    if input_command == "exit":
-        exit()
-        
-    elif input_command == "back":
-        if dataset["class"] == "collectable":
-            return
-        return "back"
-
-    elif input_command == "help":
+    if input_command == "help":
         print("available commands: ")
         print(" - exit")
         print(" - help")
         print(" - inspect")
         print(" - inventory")
         input_handler(dataset=dataset)
+
+    elif input_command == "exit":
+        exit()
+        
+    elif input_command == "back":
+        if dataset["class"] == "collectable":
+            return
+        return "back"
 
     elif input_command in ["take", "grab"]:
         return add_item_to_inventory(dataset)
