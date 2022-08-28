@@ -1,7 +1,1 @@
-{
-    "cur_noise_level": 0, 
-
-    "inventory": {
-
-    }
-}
+{"cur_noise_level": 0, "inventory": {"jungle": {"name": "jungle", "id": "1234567890", "class": "room", "url": "https://example.com/room/1234567890", "description": "jungle forest with tall trees and running water", "door": "mossy stone with obsidian handle", "doors": {}, "poi": {"waterfall": {"name": "waterfall", "description": "a waterfall cascades down the cliff face", "class": "container", "poi": {"chest": {"name": "chest", "description": "a wooden chest with a lock", "class": "container", "poi": {"key": {"name": "Jade Key", "description": "a small jade key", "class": "collectable", "rarity": 10}, "gold": {"name": "Small Pile of Gold", "description": "a small pile of gold", "class": "collectable", "rarity": 5, "value": 10}, "sword": {"name": "Iron short sword", "description": "A glinting metal sword", "class": "collectable", "rarity": 4, "value": 25}}}}}, "key": {"name": "common key", "description": "a key made of gold sitting on the ground", "class": "collectable", "rarity": 1}, "potion": {"name": "healing potion", "description": "a potion of healing", "class": "collectable", "rarity": 9, "effect": "heal"}}}}}

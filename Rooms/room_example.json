@@ -6,7 +6,7 @@
     "description": "jungle forest with tall trees and running water",
     "door": "mossy stone with obsidian handle",
     "doors": {
-
+        
     },
     "poi": {
         "waterfall": {
@@ -31,6 +31,13 @@
                             "class": "collectable",
                             "rarity": 5,
                             "value": 10
+                        },
+                        "sword": {
+                            "name": "Iron short sword",
+                            "description": "A glinting metal sword",
+                            "class": "collectable",
+                            "rarity": 4,
+                            "value": 25
                         }
                     }
                 }
