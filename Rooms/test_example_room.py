@@ -4,10 +4,12 @@ from pydoc import describe
 inventory = []
 
 f = open("room_example.json", "r")
-inv = open("inventory.json", "r")
-
 data = json.load(f)
+
+inv = open("inventory.json", "r")
 inventory = json.load(inv)
+
+
 
 print(f"you enter {data['name']} room")
 print(f"you enter a {data['description']}")
@@ -35,6 +37,13 @@ def input_handler(dataset, message="> "):
     input_command = input(message)
     input_command = input_command.lower()
     
+    if input_command == "test":
+        for idx, obj in enumerate(inventory):
+            if obj['id'] == 2:
+                inventory.pop(idx)
+        inv = open("inventory.json", "w")
+        inv.write(json.dumps("inventory.json"))
+
     # misc commands
     if input_command == "exit":
         exit()
@@ -75,7 +84,7 @@ def input_handler(dataset, message="> "):
         input_handler(dataset=dataset)
 
 def remove_json_entry(dataset):
-
+    pass
 
 def approach(dataset):
     print(dataset["description"])
