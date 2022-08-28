@@ -36,39 +36,42 @@ def get_poi(dataset):
 def input_handler(dataset, message="> "):
     input_command = input(message)
     input_command = input_command.lower()
-    
-    if input_command == "test":
-        for idx, obj in enumerate(inventory):
-            if obj['id'] == 2:
-                inventory.pop(idx)
-        inv = open("inventory.json", "w")
-        inv.write(json.dumps("inventory.json"))
 
+        
     # misc commands
     if input_command == "exit":
         exit()
         
-    if input_command == "back":
-        pass
+    elif input_command == "back":
+        return "back"
 
-    if input_command == "help":
+    elif input_command == "help":
         print("available commands: ")
         print(" - exit")
         print(" - help")
-        # print(" - inspect")
+        print(" - inspect")
+        print(" - inventory")
         input_handler(dataset=dataset)
 
-    if input_command in ["take", "grab"]:
-        inventory.append(dataset)
+    elif input_command in ["take", "grab"]:
+        # inventory.append(dataset)
         name = dataset["name"]
         article = "an" if name[0] in "aeiou" else "a"
         print(f"You have aquired {article} {name}")
+        
+        # add to inventory
+        inventory[name] = dataset
+        
+        with open("inventory.json", "w") as f:
+            json.dump(inventory, f)
+        
+        return "back"
     
     # approach
-    if input_command in dataset["poi"]:
+    elif input_command in dataset["poi"]:
         approach(dataset["poi"][input_command])
 
-    if input_command == "inspect":
+    elif input_command == "inspect":
         desc = dataset["description"]
         print(f"you see {desc}")
         
@@ -76,41 +79,37 @@ def input_handler(dataset, message="> "):
        
         return input_handler(dataset=dataset)
         
-    # if input_command == "inventory":
-    #     print("inventory")
+    elif input_command == "inventory":
+        print("inventory")
         
     else:
         print('invalid command - type "help" for a list of commands')
         input_handler(dataset=dataset)
 
-<<<<<<< HEAD
+
 def remove_json_entry(dataset):
     pass
-=======
-# def remove_json_entry(dataset):
-
->>>>>>> 54c28f22168cdf1290a1bdff74569baa807fd8de
 
 def approach(dataset):
     print(dataset["description"])
     
     if "poi" in dataset:
-        print("you see ", end="")
-        length = len(dataset["poi"])
-        for ind, item in enumerate(dataset["poi"]):
-            article = "an" if item[0] in "aeiou" else "a"
-            if ind == length - 1 and length > 1:
-                print(f"and {article} {item}.")
-                break
-            print(f"{article} {item}, ", end="")
-        
-        print("what item would you like to inspect?")
-        input_handler(dataset=dataset)
-
+        while True: 
+            print("you see ", end="")
+            length = len(dataset["poi"])
+            for ind, item in enumerate(dataset["poi"]):
+                article = "an" if item[0] in "aeiou" else "a"
+                if ind == length - 1 and length > 1:
+                    print(f"and {article} {item}.")
+                    break
+                print(f"{article} {item}, ", end="")
+            
+            print("what item would you like to inspect?")
+            if input_handler(dataset=dataset) == "back":
+                break;
     else:
         print("What would you like to do?")
-        input_handler(dataset=dataset);
-        print("there are no items here")
+        input_handler(dataset=dataset)
 
 
 if "poi" in data:
