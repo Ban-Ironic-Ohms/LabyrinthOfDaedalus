@@ -1,7 +1,7 @@
 {
     "name": "jungle",
     "id": "1234567890",
-    "class": "room",
+    "class": ["room"],
     "url": "https://example.com/room/1234567890",
     "descriptions": {
         "main_description": "jungle forest with tall trees and running water"
@@ -18,7 +18,7 @@
                 "main_description": "An orb of green gelatinous substance with random objects stuck inside it.",
                 "attack_description": "hurls a glob of goo at you."
             },
-            "class": "enemy, container, melee",
+            "class": ["enemy", "container", "melee"],
             "passive_perception": 15
         }
     },
@@ -28,21 +28,21 @@
             "descriptions": {
                 "main_description": "a waterfall cascades down the cliff face"
             },
-            "class": "container",
+            "class": ["container"],
             "poi": {
                 "chest": {
                     "name": "chest",
                     "descriptions": {
                         "main_description": "a wooden chest with a lock"
                     },
-                    "class": "container",
+                    "class": ["container"],
                     "poi": {
                         "key": {
                             "name": "Jade Key",
                             "descriptions": {
                                 "main_description": "a small jade key"
                             },
-                            "class": "collectable",
+                            "class": ["collectable"],
                             "rarity": 10
                         },
                         "gold": {
@@ -50,7 +50,7 @@
                             "descriptions": {
                                 "main_description": "a small pile of gold"
                             },
-                            "class": "collectable",
+                            "class": ["collectable"],
                             "rarity": 5,
                             "value": 10
                         },
@@ -59,7 +59,7 @@
                             "descriptions": {
                                 "main_description": "A glinting metal sword"
                             },
-                            "class": "collectable",
+                            "class": ["collectable"],
                             "rarity": 4,
                             "value": 25
                         }
@@ -72,7 +72,7 @@
             "descriptions": {
                 "main_description": "a key made of gold sitting on the ground"
             },
-            "class": "collectable",
+            "class": ["collectable"],
             "rarity": 1
         },
         "potion": {
@@ -80,7 +80,7 @@
             "descriptions": {
                 "main_description": "a potion of healing"
             },
-            "class": "collectable",
+            "class": ["collectable"],
             "rarity": 9,
             "effect": "heal"
         }

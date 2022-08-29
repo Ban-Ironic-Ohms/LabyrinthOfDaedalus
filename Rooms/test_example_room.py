@@ -1,17 +1,17 @@
 import json
-from pydoc import describe
-from random import randint, randrange
+# from pydoc import describe
+from random import randint
 
-f = open("room_example.json", "r")
-data = json.load(f)
+with open("room_example.json", "r") as room_file:
+    data = json.load(room_file)
 
-f_pd = open("player_data.json", "r")
-player_data = json.load(f_pd)
+with open("player_data.json", "r") as player_data_file:
+    player_data = json.load(player_data_file)
 
-def article(string):
+def article(string: str) -> str:
     return "an" if string[0] in "aeiou" else "a"
 
-def discribe_poi(dataset):
+def describe_poi(dataset: dict):
     if "room" in dataset["class"]:
         print(f"you enter {data['name']} room")
         print(f"you enter a {dataset['descriptions']['main_description']}")
@@ -54,7 +54,7 @@ def input_handler(dataset, message="> "):
     input_command = input_command.lower()
 
     if "enemy" in dataset["class"]:
-        if input_command in ["attack", "fight"] :
+        if input_command in ["attack", "fight"]:
             return "attack"
 
         elif input_command == "run":
@@ -78,7 +78,7 @@ def input_handler(dataset, message="> "):
         
     elif input_command == "back":
         increase_cur_noise_level(2)
-        if  "collectable" in dataset["class"]:
+        if "collectable" in dataset["class"]:
             return
         return "back"
 
@@ -90,10 +90,9 @@ def input_handler(dataset, message="> "):
     elif input_command in dataset["poi"]:
         increase_cur_noise_level(2)
         return approach(dataset["poi"][input_command])
-        
 
     elif input_command == "inspect":
-        discribe_poi(dataset)
+        describe_poi(dataset)
         return input_handler(dataset=dataset)
         
     elif input_command == "inventory":
@@ -108,42 +107,44 @@ def input_handler(dataset, message="> "):
 def approach(dataset):
     if "poi" in dataset:
         while True: 
-            discribe_poi(dataset=dataset)
+            describe_poi(dataset=dataset)
             
             input_handler_return_value = input_handler(dataset=dataset)
             if input_handler_return_value == "back":
                 break
-            elif input_handler_return_value != None:
+            elif input_handler_return_value is not None:
+                name = None
                 for i in dataset["poi"]:
                     if dataset["poi"][i] == input_handler_return_value:
                         name = i
-                        
+                        break
+
                 dataset["poi"].pop(name)
                 with open("room_example.json", "w") as f:
                     json.dump(data, f)
     else:
-        discribe_poi(dataset=dataset)
+        describe_poi(dataset=dataset)
         return input_handler(dataset=dataset)
 
 
-def add_item_to_inventory(dataset):
-    #check if you can take target item
-    if "collectable" not in dataset["class"]:
-        print(f"You can't put {article(dataset['name'])} {dataset['name']} in your inventory!")
+def add_item_to_inventory(item_data: dict):
+    # check if you can take target item
+    if "collectable" not in item_data["class"]:
+        print(f"You can't put {article(item_data['name'])} {item_data['name']} in your inventory!")
         return None
     
-    #tell player they got the item
-    name = dataset["name"]
-    print(f"You have aquired {article(name)} {name}")
+    # tell player they got the item
+    name = item_data["name"]
+    print(f"You have acquired {article(name)} {name}")
     
     # add to inventory
-    player_data["inventory"][name] = dataset
+    player_data["inventory"][name] = item_data
     
     # save to player data file
     with open("player_data.json", "w") as f:
         json.dump(player_data, f)
 
-    return dataset
+    return item_data
 
 def increase_cur_noise_level(volume_increase):
     player_data["cur_noise_level"] += volume_increase
@@ -151,14 +152,13 @@ def increase_cur_noise_level(volume_increase):
         json.dump(player_data, f)
 
     for i in data["entities"]:
-        if (int(data["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"])):
+        if int(data["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"]):
             combat(data["entities"][i])
 
 def change_player_stat(stat_name, change_amount):
     player_data[stat_name] += change_amount
     with open("player_data.json", "w") as f:
         json.dump(player_data, f)
-
 
 def combat(enemy_data):
     print(f"The {enemy_data['name']} noticed you!")
@@ -197,5 +197,6 @@ def attack_enemy(enemy_data):
         json.dump(data, f)
     print(f"You hit and deal {player_data['dmg']} to the {enemy_data['name']}.")
     print(f"It has {enemy_data['hp']} hp left. ({enemy_data['hp'] + player_data['dmg']} - {player_data['dmg']})")
+
 
 approach(data)
