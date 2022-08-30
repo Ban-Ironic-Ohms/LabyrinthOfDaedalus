@@ -14,7 +14,7 @@ with open("player_data.json", "r") as player_data_file:
 
 def describe_poi(dataset: dict):
     if "room" in dataset["class"]:
-        print(f"you enter {data['name']} room")
+        print(f"you enter {dataset['name']} room")
         print(f"you enter a {dataset['descriptions']['main_description']}")
 
         print_pois(dataset=dataset)
@@ -103,7 +103,7 @@ def input_handler(dataset, message="> "):
             return approach(dataset["poi"][list(dataset["poi"])[0]])
 
     elif input_command == "inspect":
-        print_doors()
+        print_doors(dataset)
         describe_poi(dataset)
         return input_handler(dataset=dataset)
         
@@ -164,6 +164,7 @@ def increase_cur_noise_level(volume_increase):
     with open("player_data.json", "w") as f:
         json.dump(player_data, f)
 
+    
     for i in data["entities"]:
         if int(data["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"]):
             combat(data["entities"][i])
