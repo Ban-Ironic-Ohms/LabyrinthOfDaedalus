@@ -82,6 +82,7 @@ def input_handler(dataset, message="> "):
             return
         return "back"
 
+    # take item
     elif input_command in ["take", "grab"]:
         increase_cur_noise_level(5)
         return add_item_to_inventory(dataset)
@@ -90,6 +91,12 @@ def input_handler(dataset, message="> "):
     elif input_command in dataset["poi"]:
         increase_cur_noise_level(2)
         return approach(dataset["poi"][input_command])
+    
+    # approach if there is only 1 poi
+    elif len(dataset["poi"]) == 1:
+        if input_command in ["look", "inspect", "open", "examine", "go"]:
+            increase_cur_noise_level(2)
+            return approach(dataset["poi"][list(dataset["poi"])[0]])
 
     elif input_command == "inspect":
         describe_poi(dataset)
