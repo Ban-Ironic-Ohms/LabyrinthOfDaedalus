@@ -1,7 +1,7 @@
 import json
 # from pydoc import describe
 from random import randint
-from move_rooms import load_room, get_door_description
+from move_rooms import load_room, get_door_description, print_doors
 from helper_functions import article
 
 initial_room = "room_example.json"
@@ -11,15 +11,6 @@ with open(initial_room, "r") as room_file:
 
 with open("player_data.json", "r") as player_data_file:
     player_data = json.load(player_data_file)
-
-def print_doors():
-    if len(data["doors"]) > 0:
-        if len(data["doors"]) == 1:
-            print("you see a door:")
-        else:
-            print("you see doors:")
-        for door in data["doors"]: 
-            print(f" - {door} is {get_door_description(data['doors'][door]['file_name'])}")
 
 def describe_poi(dataset: dict):
     if "room" in dataset["class"]:
@@ -79,8 +70,12 @@ def input_handler(dataset, message="> "):
     
     # room commands
     elif input_command in data["doors"]:
-        approach(load_room(data["doors"][input_command]["file_name"]))
-
+        print(data["doors"][input_command]["file_name"])
+        dataset = load_room(data["doors"][input_command]["file_name"])
+        print(dataset)
+        print_doors(dataset) # working
+        approach(dataset)
+    
     # enemy combat
     if "enemy" in dataset["class"]:
         if input_command in ["attack", "fight"]:
@@ -220,7 +215,7 @@ def attack_enemy(enemy_data):
 
 
         
-print_doors()
+print_doors(data)
 
 # initialize the first room
 approach(data)

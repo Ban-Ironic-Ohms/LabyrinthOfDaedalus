@@ -9,7 +9,10 @@
         "door_description": "sandstone door with snake carvings"
     },
     "doors": {
-        
+        "door 1": {
+            "url": "https://example.com/door/00000000000000000000000000000001",
+            "file_name": "room_example"
+        }
     },
     "entities": {
 

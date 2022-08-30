@@ -15,6 +15,16 @@ def get_door_description(room_file_name: dict, add_slash_rooms=False) -> str:
             data = json.load(room_file)
         return data["descriptions"]["door_description"]
 
+def print_doors(data):
+    if len(data["doors"]) > 0:
+        if len(data["doors"]) == 1:
+            print("you see a door:")
+        else:
+            print("you see doors:")
+        for door in data["doors"]: 
+            print(f" - {door} is {get_door_description(data['doors'][door]['file_name'])}")
+
+
 # load the room and get the sum of all of the rarity, value, dmg, and hp values of the items in the room
 def get_door_value(room_file_name):
     return load_room(room_file_name)["value"]
