@@ -18,15 +18,15 @@
 
     },
     "poi": {
-        "waterfall": {
+        "dune": {
             "name": "dune",
             "descriptions": {
                 "main_description": "a sand dune with some sand and sand"
             },
             "class": ["container"],
             "poi": {
-                "chest": {
-                    "sack": "cloth sack",
+                "sack": {
+                    "name": "cloth sack",
                     "descriptions": {
                         "main_description": "a small cloth sack tied shut"
                     },
