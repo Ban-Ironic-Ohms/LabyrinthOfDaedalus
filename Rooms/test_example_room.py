@@ -70,10 +70,8 @@ def input_handler(dataset, message="> "):
     
     # room commands
     elif input_command in data["doors"]:
-        print(data["doors"][input_command]["file_name"])
         dataset = load_room(data["doors"][input_command]["file_name"])
-        print(dataset)
-        print_doors(dataset) # working
+        print_doors(dataset) 
         approach(dataset)
     
     # enemy combat
@@ -189,7 +187,7 @@ def combat(enemy_data):
         input_handler_return_value = input_handler(enemy_data)
         if input_handler_return_value == "attack":
             attack_enemy(enemy_data=enemy_data)
-        elif input_handler_return_value == "run":
+        elif input_handler_return_value in ["run", "flee", "escape", "back", "back down", "back away", "retreat"]:
             if randint(1, 10) > 8:
                 print("You run away and manage to escape!")
                 exit()
