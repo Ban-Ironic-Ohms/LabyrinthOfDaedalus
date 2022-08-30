@@ -1,26 +1,31 @@
 import json
 # from pydoc import describe
 from random import randint
+from move_rooms import load_room, get_door_description
+from helper_functions import article
 
-with open("room_example.json", "r") as room_file:
+initial_room = "room_example.json"
+
+with open(initial_room, "r") as room_file:
     data = json.load(room_file)
 
 with open("player_data.json", "r") as player_data_file:
     player_data = json.load(player_data_file)
 
-def article(string: str) -> str:
-    return "an" if string[0] in "aeiou" else "a"
+def print_doors():
+    if len(data["doors"]) > 0:
+        if len(data["doors"]) == 1:
+            print("you see a door:")
+        else:
+            print("you see doors:")
+        for door in data["doors"]: 
+            print(f" - {door} is {get_door_description(data['doors'][door]['file_name'])}")
 
 def describe_poi(dataset: dict):
     if "room" in dataset["class"]:
         print(f"you enter {data['name']} room")
         print(f"you enter a {dataset['descriptions']['main_description']}")
 
-        if len(data["doors"]) > 0:
-            print("you see doors:")
-            for door in data["doors"]:
-                print(f" - {door}")
-        
         print_pois(dataset=dataset)
 
     elif "poi" in dataset:
@@ -53,17 +58,6 @@ def input_handler(dataset, message="> "):
     input_command = input(message)
     input_command = input_command.lower()
 
-    if "enemy" in dataset["class"]:
-        if input_command in ["attack", "fight"]:
-            return "attack"
-
-        elif input_command == "run":
-            return "run"
-        
-        else:
-            print(f"You can't use {input_command} in combat")
-            return
-
     # misc commands
     if input_command == "help":
         print("available commands: ")
@@ -71,6 +65,7 @@ def input_handler(dataset, message="> "):
         print(" - help")
         print(" - inspect")
         print(" - inventory")
+        print(" - door #")
         input_handler(dataset=dataset)
 
     elif input_command == "exit":
@@ -81,7 +76,23 @@ def input_handler(dataset, message="> "):
         if "collectable" in dataset["class"]:
             return
         return "back"
+    
+    # room commands
+    elif input_command in data["doors"]:
+        approach(load_room(data["doors"][input_command]["file_name"]))
 
+    # enemy combat
+    if "enemy" in dataset["class"]:
+        if input_command in ["attack", "fight"]:
+            return "attack"
+
+        elif input_command == "run":
+            return "run"
+        
+        else:
+            print(f"You can't use {input_command} in combat")
+            return
+        
     # take item
     elif input_command in ["take", "grab"]:
         increase_cur_noise_level(5)
@@ -99,6 +110,7 @@ def input_handler(dataset, message="> "):
             return approach(dataset["poi"][list(dataset["poi"])[0]])
 
     elif input_command == "inspect":
+        print_doors()
         describe_poi(dataset)
         return input_handler(dataset=dataset)
         
@@ -123,11 +135,12 @@ def approach(dataset):
                 name = None
                 for i in dataset["poi"]:
                     if dataset["poi"][i] == input_handler_return_value:
+                        # needs to reworked not remove the first item with the same name
                         name = i
                         break
 
                 dataset["poi"].pop(name)
-                with open("room_example.json", "w") as f:
+                with open(initial_room, "w") as f:
                     json.dump(data, f)
     else:
         describe_poi(dataset=dataset)
@@ -200,10 +213,14 @@ def combat(enemy_data):
 def attack_enemy(enemy_data):
     print(player_data["descriptions"]["attack_description"])
     enemy_data["hp"] -= player_data["dmg"]
-    with open("room_example.json", "w") as f:
+    with open(initial_room, "w") as f:
         json.dump(data, f)
     print(f"You hit and deal {player_data['dmg']} to the {enemy_data['name']}.")
     print(f"It has {enemy_data['hp']} hp left. ({enemy_data['hp'] + player_data['dmg']} - {player_data['dmg']})")
 
 
+        
+print_doors()
+
+# initialize the first room
 approach(data)

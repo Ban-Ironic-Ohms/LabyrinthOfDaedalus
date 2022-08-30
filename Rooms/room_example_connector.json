@@ -1,0 +1,72 @@
+{
+    "name": "desert",
+    "id": "00000000000000000000000000000002",
+    "value": 2,
+    "class": ["room"],
+    "url": "https://example.com/room/00000000000000000000000000000002",
+    "descriptions": {
+        "main_description": "a vast desert with a single palm tree",
+        "door_description": "sandstone door with snake carvings"
+    },
+    "doors": {
+        
+    },
+    "entities": {
+
+    },
+    "poi": {
+        "waterfall": {
+            "name": "dune",
+            "descriptions": {
+                "main_description": "a sand dune with some sand and sand"
+            },
+            "class": ["container"],
+            "poi": {
+                "chest": {
+                    "sack": "cloth sack",
+                    "descriptions": {
+                        "main_description": "a small cloth sack tied shut"
+                    },
+                    "class": ["container"],
+                    "poi": {
+                        "key": {
+                            "name": "Brass Key",
+                            "descriptions": {
+                                "main_description": "a large rusty brass key"
+                            },
+                            "class": ["collectable"],
+                            "rarity": 3
+                        },
+                        "gold": {
+                            "name": "A single peice of gold",
+                            "descriptions": {
+                                "main_description": "one gold peice"
+                            },
+                            "class": ["collectable"],
+                            "rarity": 2,
+                            "value": 1
+                        },
+                        "dagger": {
+                            "name": "gold dagger",
+                            "descriptions": {
+                                "main_description": "a small gold dagger with jewel inlay"
+                            },
+                            "class": ["collectable"],
+                            "rarity": 13,
+                            "value": 25
+                        }
+                    }
+                }
+            }
+        },
+        "potion": {
+            "name": "healing potion",
+            "descriptions": {
+                "main_description": "a potion of healing"
+            },
+            "class": ["collectable"],
+            "rarity": 9,
+            "effect": "heal"
+        }
+    }
+}

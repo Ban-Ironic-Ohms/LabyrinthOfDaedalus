@@ -1,13 +1,18 @@
 {
     "name": "jungle",
-    "id": "1234567890",
+    "id": "00000000000000000000000000000001",
+    "value": 0,
     "class": ["room"],
-    "url": "https://example.com/room/1234567890",
+    "url": "https://example.com/room/00000000000000000000000000000001",
     "descriptions": {
-        "main_description": "jungle forest with tall trees and running water"
+        "main_description": "jungle forest with tall trees and running water",
+        "door_description": "mossy stone with obsidian handle"
     },
-    "door": "mossy stone with obsidian handle",
     "doors": {
+        "door 1": {
+            "url": "https://example.com/room/00000000000000000000000000000002",
+            "file_name": "room_example_connector"
+        }
     },
     "entities": {
         "slime": {
