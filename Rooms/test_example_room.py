@@ -64,7 +64,7 @@ def input_handler(dataset, message="> "):
         
     elif input_command == "back":
         increase_cur_noise_level(2)
-        if "collectable" in dataset["class"]:
+        if "collectible" in dataset["class"]:
             return
         return "back"
     
@@ -142,7 +142,7 @@ def approach(dataset):
 
 def add_item_to_inventory(item_data: dict):
     # check if you can take target item
-    if "collectable" not in item_data["class"]:
+    if "collectible" not in item_data["class"]:
         print(f"You can't put {article(item_data['name'])} {item_data['name']} in your inventory!")
         return None
     
