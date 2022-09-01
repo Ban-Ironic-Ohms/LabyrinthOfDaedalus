@@ -2,7 +2,9 @@
     "name": "jungle",
     "id": "00000000000000000000000000000001",
     "value": 0,
-    "class": ["room"],
+    "class": [
+        "room"
+    ],
     "url": "https://example.com/room/00000000000000000000000000000001",
     "descriptions": {
         "main_description": "jungle forest with tall trees and running water",
@@ -17,13 +19,17 @@
     "entities": {
         "slime": {
             "name": "Green Slime",
-            "hp": 10,
+            "hp": -8,
             "dmg": 3,
             "descriptions": {
                 "main_description": "An orb of green gelatinous substance with random objects stuck inside it.",
                 "attack_description": "hurls a glob of goo at you."
             },
-            "class": ["enemy", "container", "melee"],
+            "class": [
+                "enemy",
+                "container",
+                "melee"
+            ],
             "passive_perception": 15
         }
     },
@@ -33,14 +39,18 @@
             "descriptions": {
                 "main_description": "a waterfall cascades down the cliff face"
             },
-            "class": ["container"],
+            "class": [
+                "container"
+            ],
             "poi": {
                 "chest": {
                     "name": "chest",
                     "descriptions": {
                         "main_description": "a wooden chest with a lock"
                     },
-                    "class": ["container"],
+                    "class": [
+                        "container"
+                    ],
                     "poi": {
                         "key": {
                             "name": "Jade Key",

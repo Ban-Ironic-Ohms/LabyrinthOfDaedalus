@@ -14,7 +14,7 @@ with open("player_data.json", "r") as player_data_file:
 
 def describe_poi(dataset: dict):
     if "room" in dataset["class"]:
-        print(f"you enter {data['name']} room")
+        print(f"you enter {dataset['name']} room")
         print(f"you enter a {dataset['descriptions']['main_description']}")
 
         print_pois(dataset=dataset)
@@ -63,7 +63,7 @@ def input_handler(dataset, message="> "):
         exit()
         
     elif input_command == "back":
-        increase_cur_noise_level(2)
+        increase_cur_noise_level(2, dataset)
         if "collectible" in dataset["class"]:
             return
         return "back"
@@ -88,27 +88,27 @@ def input_handler(dataset, message="> "):
         
     # take item
     elif input_command in ["take", "grab"]:
-        increase_cur_noise_level(5)
+        increase_cur_noise_level(5, dataset)
         return add_item_to_inventory(dataset)
     
     # approach
     elif input_command in dataset["poi"]:
-        increase_cur_noise_level(2)
+        increase_cur_noise_level(2, dataset)
         return approach(dataset["poi"][input_command])
     
     # approach if there is only 1 poi
     elif len(dataset["poi"]) == 1:
         if input_command in ["look", "inspect", "open", "examine", "go"]:
-            increase_cur_noise_level(2)
+            increase_cur_noise_level(2, dataset)
             return approach(dataset["poi"][list(dataset["poi"])[0]])
 
     elif input_command == "inspect":
-        print_doors()
+        print_doors(dataset)
         describe_poi(dataset)
         return input_handler(dataset=dataset)
         
     elif input_command == "inventory":
-        increase_cur_noise_level(1)
+        increase_cur_noise_level(1, dataset)
         print("inventory")
         
     else:
@@ -159,14 +159,15 @@ def add_item_to_inventory(item_data: dict):
 
     return item_data
 
-def increase_cur_noise_level(volume_increase):
+def increase_cur_noise_level(volume_increase, dataset=data):
     player_data["cur_noise_level"] += volume_increase
     with open("player_data.json", "w") as f:
         json.dump(player_data, f)
 
-    for i in data["entities"]:
-        if int(data["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"]):
-            combat(data["entities"][i])
+    
+    for i in dataset["entities"]:
+        if int(dataset["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"]):
+            combat(dataset["entities"][i])
 
 def change_player_stat(stat_name, change_amount):
     player_data[stat_name] += change_amount
