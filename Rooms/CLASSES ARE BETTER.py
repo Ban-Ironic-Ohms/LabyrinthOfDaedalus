@@ -3,50 +3,67 @@ import json
 import random
 
 def load_file(file_name: str) -> dict:
-    with open(file_name, "w") as f:
+    with open(file_name, "r") as f:
         return json.load(f)
+
+def write_to_file(file_name: str, data: dict) -> dict:
+    with open(file_name, "w") as f:
+        return json.dump(data, f)
 
 class Descriptions:
     DEFAULT = "unimplemented description"
 
-    def __init__(self, main=DEFAULT, attack=DEFAULT, door=DEFAULT):
-        self.main = main
-        self.attack = attack
-        self.door = door
+    def __init__(self, main_description=DEFAULT, attack_description=DEFAULT, door_description=DEFAULT):
+        self.main = main_description
+        self.attack = attack_description
+        self.door = door_description
 
 class Poi:
     @staticmethod
-    def get_poi_type(poi_data):
+    def get_poi(poi_data, parent_poi=None):
         if "room" in poi_data["class"]:
-            return Room(poi_data)
+            return Room(poi_data, parent_poi)
         if "enemy" in poi_data["class"]:
-            return Enemy(poi_data)
+            return Enemy(poi_data, parent_poi)
         else:
-            return Entity(poi_data)
-
-    def __init__(self, poi_data: dict):
-        self.data = poi_data
-
-        self.child_pois = [self.get_poi_type(child_poi_data) for child_poi_data in self.data["poi"]]
-
-class Room(Poi):
-    ...
-
-class Entity(Poi):
-    def __init__(self, entity_data):
-        super().__init__(entity_data)
+            return Entity(poi_data, parent_poi)
 
     @property
     def name(self):
         return self.data["name"]
 
-    @property
-    def entity_class(self):
-        return self.data["entity_class"]
+    def __init__(self, poi_data: dict, parent_poi: Poi | None = None):
+        self.data = poi_data
+        self.parent_poi = parent_poi
+
+        if "poi" in self.data:
+            self.child_pois = [self.get_poi(child_poi_data) for
+                               child_poi_tag, child_poi_data in self.data["poi"].items()]
+        else:
+            self.child_pois = []
+
+    def print_poi(self, level=0):
+        if level == 0:
+            print(f"{self.name}:")
+        else:
+            print(f"{' ' * (level * 3 - 1)}- {self.name}")
+        for child_poi in self.child_pois:
+            child_poi.print_pois(level + 1)
 
     @property
     def descriptions(self):
-        return Descriptions(main=self.data["descriptions"]["main_description"])
+        return Descriptions(**self.data["descriptions"])
+
+class Room(Poi):
+    ...
+
+class Entity(Poi):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @property
+    def entity_class(self):
+        return self.data["entity_class"]
 
 class Enemy(Entity):
 
@@ -61,13 +78,6 @@ class Enemy(Entity):
     @property
     def dmg(self):
         return self.data["dmg"]
-
-    @property
-    def descriptions(self):
-        return Descriptions(
-            main=self.data["descriptions"]["main_description"],
-            attack=self.data["descriptions"]["attack_description"]
-        )
 
     def combat(self, player: Player, input_handler):
         print(f"The {self.name} noticed you!")
@@ -132,10 +142,7 @@ class Player:
 
     @property
     def descriptions(self):
-        return Descriptions(
-            main=self.data["descriptions"]["main_description"],
-            attack=self.data["descriptions"]["attack_description"]
-        )
+        return Descriptions(**self.data["descriptions"])
 
     def add_to_inventory(self, item):
         ...
@@ -151,3 +158,7 @@ class Player:
 class Item:
     def __init__(self):
         ...
+
+
+main_room = Poi.get_poi(load_file("room_example.json"))
+main_room.print_pois()

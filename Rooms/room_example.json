@@ -57,7 +57,9 @@
                             "descriptions": {
                                 "main_description": "a small jade key"
                             },
-                            "class": ["collectible"],
+                            "class": [
+                                "collectible"
+                            ],
                             "rarity": 10
                         },
                         "gold": {
@@ -65,7 +67,9 @@
                             "descriptions": {
                                 "main_description": "a small pile of gold"
                             },
-                            "class": ["collectible"],
+                            "class": [
+                                "collectible"
+                            ],
                             "rarity": 5,
                             "value": 10
                         },
@@ -74,7 +78,9 @@
                             "descriptions": {
                                 "main_description": "A glinting metal sword"
                             },
-                            "class": ["collectible"],
+                            "class": [
+                                "collectible"
+                            ],
                             "rarity": 4,
                             "value": 25
                         }
@@ -87,7 +93,9 @@
             "descriptions": {
                 "main_description": "a key made of gold sitting on the ground"
             },
-            "class": ["collectible"],
+            "class": [
+                "collectible"
+            ],
             "rarity": 1
         },
         "potion": {
@@ -95,7 +103,9 @@
             "descriptions": {
                 "main_description": "a potion of healing"
             },
-            "class": ["collectible"],
+            "class": [
+                "collectible"
+            ],
             "rarity": 9,
             "effect": "heal"
         }
