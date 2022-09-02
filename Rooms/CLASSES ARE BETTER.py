@@ -27,7 +27,7 @@ class Poi:
     def __init__(self, poi_data: dict):
         self.data = poi_data
 
-        self.child_pois = [self.get_poi_type(child_poi_data) for child_poi_data]
+        self.child_pois = [self.get_poi_type(child_poi_data) for child_poi_data in self.data["poi"]]
 
 class Room(Poi):
     ...
