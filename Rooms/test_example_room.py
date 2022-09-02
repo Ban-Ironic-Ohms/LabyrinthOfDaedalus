@@ -12,6 +12,7 @@ with open(initial_room, "r") as room_file:
 with open("player_data.json", "r") as player_data_file:
     player_data = json.load(player_data_file)
 
+# Converted to classes
 def describe_poi(dataset: dict):
     if "room" in dataset["class"]:
         print(f"you enter {dataset['name']} room")
@@ -27,7 +28,7 @@ def describe_poi(dataset: dict):
         print(dataset["descriptions"]["main_description"])
         print("What would you like to do?")
 
-
+# Converted to classes
 def print_pois(dataset):
     print("You see ", end="")
     length = len(dataset["poi"])
@@ -45,6 +46,7 @@ def print_pois(dataset):
     else:
         print("What would you like to look at?")
 
+# TODO: Convert to classes
 def input_handler(dataset, message="> "):
     input_command = input(message)
     input_command = input_command.lower()
@@ -116,6 +118,7 @@ def input_handler(dataset, message="> "):
         input_handler(dataset=dataset)
 
 
+# TODO: Convert to classes
 def approach(dataset):
     if "poi" in dataset:
         while True: 
@@ -140,6 +143,7 @@ def approach(dataset):
         return input_handler(dataset=dataset)
 
 
+# TODO: Convert to classes
 def add_item_to_inventory(item_data: dict):
     # check if you can take target item
     if "collectible" not in item_data["class"]:
@@ -159,6 +163,7 @@ def add_item_to_inventory(item_data: dict):
 
     return item_data
 
+# Converted to classes
 def increase_cur_noise_level(volume_increase, dataset=data):
     player_data["cur_noise_level"] += volume_increase
     with open("player_data.json", "w") as f:
@@ -169,11 +174,13 @@ def increase_cur_noise_level(volume_increase, dataset=data):
         if int(dataset["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"]):
             combat(dataset["entities"][i])
 
+# Converted to classes
 def change_player_stat(stat_name, change_amount):
     player_data[stat_name] += change_amount
     with open("player_data.json", "w") as f:
         json.dump(player_data, f)
 
+# Converted to classes
 def combat(enemy_data):
     print(f"The {enemy_data['name']} noticed you!")
 
@@ -204,6 +211,7 @@ def combat(enemy_data):
         print(f"It hits and deals you {enemy_data['dmg']} hp")
         print(f"You have {player_data['hp']} hp left. ({player_data['hp'] + enemy_data['dmg']} - {enemy_data['dmg']})")
 
+# Converted to classes
 def attack_enemy(enemy_data):
     print(player_data["descriptions"]["attack_description"])
     enemy_data["hp"] -= player_data["dmg"]
@@ -212,8 +220,6 @@ def attack_enemy(enemy_data):
     print(f"You hit and deal {player_data['dmg']} to the {enemy_data['name']}.")
     print(f"It has {enemy_data['hp']} hp left. ({enemy_data['hp'] + player_data['dmg']} - {player_data['dmg']})")
 
-
-        
 print_doors(data)
 
 # initialize the first room
