@@ -48,7 +48,7 @@ class Poi:
         else:
             print(f"{' ' * (level * 3 - 1)}- {self.name}")
         for child_poi in self.child_pois:
-            child_poi.print_pois(level + 1)
+            child_poi.print_poi(level + 1)
 
     @property
     def descriptions(self):
@@ -158,7 +158,3 @@ class Player:
 class Item:
     def __init__(self):
         ...
-
-
-main_room = Poi.get_poi(load_file("room_example.json"))
-main_room.print_pois()
