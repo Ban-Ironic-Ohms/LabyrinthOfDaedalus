@@ -71,6 +71,10 @@ class Enemy(Entity):
     def hp(self):
         return self.data["hp"]
 
+    @hp.setter
+    def hp(self, value):
+        self.data["hp"] = value
+
     @property
     def name(self):
         return self.data["name"]
@@ -147,7 +151,7 @@ class Player:
     def add_to_inventory(self, item):
         ...
 
-    def attack_enemy(self, enemy):
+    def attack_enemy(self, enemy: Enemy):
         print(self.descriptions.attack)
         old_enemy_hp = enemy.hp
         enemy.hp -= self.dmg
