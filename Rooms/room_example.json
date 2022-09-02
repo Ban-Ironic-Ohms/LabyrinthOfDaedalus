@@ -58,7 +58,7 @@
                                 "main_description": "a small jade key"
                             },
                             "class": [
-                                "collectible"
+                                "item"
                             ],
                             "rarity": 10
                         },
@@ -68,7 +68,7 @@
                                 "main_description": "a small pile of gold"
                             },
                             "class": [
-                                "collectible"
+                                "item"
                             ],
                             "rarity": 5,
                             "value": 10
@@ -79,7 +79,7 @@
                                 "main_description": "A glinting metal sword"
                             },
                             "class": [
-                                "collectible"
+                                "item"
                             ],
                             "rarity": 4,
                             "value": 25
@@ -94,7 +94,7 @@
                 "main_description": "a key made of gold sitting on the ground"
             },
             "class": [
-                "collectible"
+                "item"
             ],
             "rarity": 1
         },
@@ -104,7 +104,7 @@
                 "main_description": "a potion of healing"
             },
             "class": [
-                "collectible"
+                "item"
             ],
             "rarity": 9,
             "effect": "heal"

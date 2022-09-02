@@ -30,10 +30,6 @@ class Poi:
         else:
             return Entity(poi_data, parent_poi)
 
-    @property
-    def name(self):
-        return self.data["name"]
-
     def __init__(self, poi_data: dict, parent_poi: Poi | None = None):
         self.data = poi_data
         self.parent_poi = parent_poi
@@ -43,6 +39,14 @@ class Poi:
                                child_poi_tag, child_poi_data in self.data["poi"].items()]
         else:
             self.child_pois = []
+
+    @property
+    def name(self):
+        return self.data["name"]
+
+    @property
+    def cls(self):
+        return self.data["class"]
 
     def print_poi(self, level=0):
         if level == 0:
@@ -94,10 +98,6 @@ class Entity(Poi):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @property
-    def entity_class(self):
-        return self.data["entity_class"]
-
 class Enemy(Entity):
 
     @property
@@ -119,7 +119,7 @@ class Enemy(Entity):
     def combat(self, player: Player, input_handler):
         print(f"The {self.name} noticed you!")
 
-        if "ranged" in self.entity_class:
+        if "ranged" in self.cls:
             print(
                 f"With its range the {self.name} gets a free attack on you. It {self.descriptions.attack}")
             player.hp -= self.dmg
@@ -147,7 +147,6 @@ class Enemy(Entity):
             player.hp -= self.dmg
             print(f"It hits and deals you {self.dmg} hp")
             print(f"You have {player.hp} hp left. ({prev_player_hp} - {self.dmg})")
-
 
 class Player:
     def __init__(self, player_data: dict):
@@ -191,26 +190,24 @@ class Player:
 
     @property
     def inventory(self):
+        # TODO: Don't use dictionaries to store child_pois in json. We have no use for the keys,
+        #  and duplicate keys could be really bad. Starts to get rly bad when you transferring items between rooms.
+
         return self.data["inventory"]
 
-    def add_to_inventory(self, item: Item):
+    def add_to_inventory(self, item: Poi):
+        name = item.name
+
         # check if you can take target item
-        if "collectible" not in item_data["class"]:
-            print(f"You can't put {article(item_data['name'])} {item_data['name']} in your inventory!")
+        if "item" not in item.cls:
+            print(f"You can't put {article(name)} {name} in your inventory!")
             return None
 
         # tell player they got the item
-        name = item_data["name"]
         print(f"You have acquired {article(name)} {name}")
 
         # add to inventory
-        player_data["inventory"][name] = item_data
-
-        # save to player data file
-        with open("player_data.json", "w") as f:
-            json.dump(player_data, f)
-
-        return item_data
+        self.inventory.append(item.data)
 
     def attack_enemy(self, enemy: Enemy):
         print(self.descriptions.attack)
@@ -220,9 +217,5 @@ class Player:
         print(f"You hit and deal {self.dmg} to the {enemy.name}.")
         print(f"It has {enemy.hp} hp left. ({old_enemy_hp} - {self.dmg})")
 
-class Item:
-    # TODO: Is this a poi? No, right? Or else you shouldn't
-    def __init__(self, item_data):
-        self.data = item_data
 
 main_room = Room(load_file("room_example.json"))
