@@ -11,6 +11,43 @@ def write_to_file(file_name: str, data: dict):
     with open(file_name, "w") as f:
         return json.dump(data, f)
 
+def input_handler(dataset, message: str = "> "):
+    input_command = input(message)
+    input_command = input_command.lower()
+    
+    
+    
+    # misc commands
+    if input_command == "help":
+        print("available commands: ")
+        print(" - exit")
+        print(" - help")
+        print(" - inspect")
+        print(" - inventory")
+        print(" - door #")
+        input_handler(dataset=dataset)
+
+    elif input_command == "exit":
+        exit()
+
+    # this needs to be changed to print just the visible items - not sure what fnc to use
+    elif input_command in ["inspect","info", "look"]:
+        dataset.print_poi()
+        
+
+    
+    # todo back
+    
+    # todo go to doors
+    
+    elif input_command in dataset.child_pois:
+        print(dataset.child_pois[input_command].description)
+        input_handler(dataset=dataset.child_pois[input_command])
+
+    else:
+        print(dataset.child_pois)
+        return input_command
+    
 class Descriptions:
     DEFAULT = "unimplemented description"
 
@@ -216,6 +253,22 @@ class Player:
         # enemy.save_data()
         print(f"You hit and deal {self.dmg} to the {enemy.name}.")
         print(f"It has {enemy.hp} hp left. ({old_enemy_hp} - {self.dmg})")
+        
+    def approach(self, target: Poi):
+        
+        print(f"You approach {article(target.name)} {target.name}")
+        target.print_poi()
+
+        if len(target.child_pois) > 0:
+            while True:
+                # target.describe_child_pois()
+                
+                input_handler_return_value = input_handler(target)
+                print(input_handler_return_value)
 
 
 main_room = Room(load_file("room_example.json"))
+
+player = Player(load_file("player_data.json"))
+
+player.approach(main_room)
