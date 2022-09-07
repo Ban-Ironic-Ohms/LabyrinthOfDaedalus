@@ -99,16 +99,16 @@ class Poi:
             child_poi.print_poi(level + 1)
             
     def print_visable(self, level=0):
-        print("You see ", end="")
-        length = len(self.child_pois)
-        for ind, item in enumerate(self.child_pois):
-            if ind == length - 1 and length > 1:
-                print(f"and {article(item.name)} {item.name}.")
-                break
-            if length == 1:
-                print(f"{article(item.name)} {item.name}. ", end="")
-                break
-            print(f"{article(item.name)} {item.name}, ", end="")
+        if (length := len(self.child_pois)) > 0:
+            print("You see ", end="")
+            for ind, item in enumerate(self.child_pois):
+                if ind == length - 1 and length > 1:
+                    print(f"and {article(item.name)} {item.name}.")
+                    break
+                if length == 1:
+                    print(f"{article(item.name)} {item.name}. ", end="")
+                    break
+                print(f"{article(item.name)} {item.name}, ", end="")
 
         if length == 1:
             print("What would you like to do?")
