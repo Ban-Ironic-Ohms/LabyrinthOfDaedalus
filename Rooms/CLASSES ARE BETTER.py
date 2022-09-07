@@ -15,8 +15,6 @@ def input_handler(dataset, message: str = "> "):
     input_command = input(message)
     input_command = input_command.lower()
     
-    
-    
     # misc commands
     if input_command == "help":
         print("available commands: ")
@@ -32,7 +30,14 @@ def input_handler(dataset, message: str = "> "):
 
     # this needs to be changed to print just the visible items - not sure what fnc to use
     elif input_command in ["inspect","info", "look"]:
-        dataset.print_poi()
+        dataset.print_visable()
+        
+    elif input_command in [child_poi_but_i_need_the_name.name for child_poi_but_i_need_the_name in dataset.child_pois]:
+        for child_poi_that_we_might_want in dataset.child_pois:
+            if child_poi_that_we_might_want.name == input_command:
+                player.approach(child_poi_that_we_might_want)
+                return
+        
         
 
     
@@ -92,6 +97,24 @@ class Poi:
             print(f"{' ' * (level * 3 - 1)}- {self.name}")
         for child_poi in self.child_pois:
             child_poi.print_poi(level + 1)
+            
+    def print_visable(self, level=0):
+        print("You see ", end="")
+        length = len(self.child_pois)
+        for ind, item in enumerate(self.child_pois):
+            if ind == length - 1 and length > 1:
+                print(f"and {article(item.name)} {item.name}.")
+                break
+            if length == 1:
+                print(f"{article(item.name)} {item.name}. ", end="")
+                break
+            print(f"{article(item.name)} {item.name}, ", end="")
+
+        if length == 1:
+            print("What would you like to do?")
+        else:
+            print("What would you like to look at?")
+
 
     @property
     def descriptions(self):
@@ -257,14 +280,11 @@ class Player:
     def approach(self, target: Poi):
         
         print(f"You approach {article(target.name)} {target.name}")
-        target.print_poi()
+        target.print_visable()
 
         if len(target.child_pois) > 0:
-            while True:
-                # target.describe_child_pois()
-                
+            while True:                
                 input_handler_return_value = input_handler(target)
-                print(input_handler_return_value)
 
 
 main_room = Room(load_file("room_example.json"))
