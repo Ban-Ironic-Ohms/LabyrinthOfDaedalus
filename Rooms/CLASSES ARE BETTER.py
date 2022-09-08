@@ -35,8 +35,8 @@ class Poi:
         self.parent_poi = parent_poi
 
         if "poi" in self.data:
-            self.child_pois = [self.get_poi(child_poi_data) for
-                               child_poi_tag, child_poi_data in self.data["poi"].items()]
+            self.child_pois = [self.get_poi(child_poi_data, parent_poi=self) for
+                               child_poi_data in self.data["poi"]]
         else:
             self.child_pois = []
 
@@ -91,8 +91,26 @@ class Poi:
         #     for door in data["doors"]:
         #         print(f" - {door} is {get_door_description(data['doors'][door]['file_name'])}")
 
+    def refresh_child_pois(self):
+        self.data["poi"] = [child_poi.data for child_poi in self.child_pois]
+
+    def save_data(self):
+        self.refresh_child_pois()
+        if self.parent_poi is None:
+            raise TypeError("This poi is not contained within a room")
+        else:
+            self.parent_poi.save_data()
+
 class Room(Poi):
-    ...
+    def __init__(self, data_file_name, room_data=None, **kwargs):
+        if room_data is None:
+            room_data = load_file(data_file_name)
+        self.data_file_name = data_file_name
+        super().__init__(room_data, **kwargs)
+
+    def save_data(self):
+        self.refresh_child_pois()
+        write_to_file(self.data_file_name, self.data)
 
 class Entity(Poi):
     def __init__(self, *args, **kwargs):
@@ -188,12 +206,8 @@ class Player:
     def noise_level(self, value):
         self.data["cur_noise_level"] = value
 
-    @property
-    def inventory(self):
-        # TODO: Don't use dictionaries to store child_pois in json. We have no use for the keys,
-        #  and duplicate keys could be really bad. Starts to get rly bad when you transferring items between rooms.
-
-        return self.data["inventory"]
+    # TODO: Don't use dictionaries to store child_pois in json. We have no use for the keys,
+    #  and duplicate keys could be really bad. Starts to get rly bad when you transferring items between rooms.
 
     def add_to_inventory(self, item: Poi):
         name = item.name
@@ -218,4 +232,6 @@ class Player:
         print(f"It has {enemy.hp} hp left. ({old_enemy_hp} - {self.dmg})")
 
 
-main_room = Room(load_file("room_example.json"))
+main_room = Room("room_example.json")
+
+main_room.save_data()
