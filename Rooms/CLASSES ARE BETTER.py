@@ -11,6 +11,45 @@ def write_to_file(file_name: str, data: dict):
     with open(file_name, "w") as f:
         return json.dump(data, f)
 
+def input_handler(dataset, message: str = "> "):
+    input_command = input(message)
+    input_command = input_command.lower()
+    
+    # misc commands
+    if input_command == "help":
+        print("available commands: ")
+        print(" - exit")
+        print(" - help")
+        print(" - inspect")
+        print(" - inventory")
+        print(" - door #")
+        input_handler(dataset=dataset)
+
+    elif input_command == "exit":
+        exit()
+
+    # this needs to be changed to print just the visible items - not sure what fnc to use
+    elif input_command in ["inspect", "info", "look"]:
+        dataset.print_visable()
+        
+    elif input_command in [child_poi_but_i_need_the_name.name for child_poi_but_i_need_the_name in dataset.child_pois]:
+        for child_poi_that_we_might_want in dataset.child_pois:
+            if child_poi_that_we_might_want.name == input_command:
+                player.approach(child_poi_that_we_might_want)
+                return
+
+    # todo back
+    
+    # todo go to doors
+    
+    elif input_command in dataset.child_pois:
+        print(dataset.child_pois[input_command].description)
+        input_handler(dataset=dataset.child_pois[input_command])
+
+    else:
+        print(dataset.child_pois)
+        return input_command
+    
 class Descriptions:
     DEFAULT = "unimplemented description"
 
@@ -55,6 +94,24 @@ class Poi:
             print(f"{' ' * (level * 3 - 1)}- {self.name}")
         for child_poi in self.child_pois:
             child_poi.print_poi(level + 1)
+            
+    def print_visable(self, level=0):
+        if (length := len(self.child_pois)) > 0:
+            print("You see ", end="")
+            for ind, item in enumerate(self.child_pois):
+                if ind == length - 1 and length > 1:
+                    print(f"and {article(item.name)} {item.name}.")
+                    break
+                if length == 1:
+                    print(f"{article(item.name)} {item.name}. ", end="")
+                    break
+                print(f"{article(item.name)} {item.name}, ", end="")
+
+        if length == 1:
+            print("What would you like to do?")
+        else:
+            print("What would you like to look at?")
+
 
     @property
     def descriptions(self):
@@ -134,7 +191,7 @@ class Enemy(Entity):
     def dmg(self):
         return self.data["dmg"]
 
-    def combat(self, player: Player, input_handler):
+    def combat(self, player: Player):
         print(f"The {self.name} noticed you!")
 
         if "ranged" in self.cls:
@@ -167,8 +224,12 @@ class Enemy(Entity):
             print(f"You have {player.hp} hp left. ({prev_player_hp} - {self.dmg})")
 
 class Player:
-    def __init__(self, player_data: dict):
-        self.data = player_data
+    def __init__(self, data_file_name, player_data: dict = None):
+        self.data_file_name = data_file_name
+        if player_data:
+            self.data = player_data
+        else:
+            self.data = load_file(data_file_name)
 
     @property
     def inventory(self):
@@ -230,8 +291,25 @@ class Player:
         # enemy.save_data()
         print(f"You hit and deal {self.dmg} to the {enemy.name}.")
         print(f"It has {enemy.hp} hp left. ({old_enemy_hp} - {self.dmg})")
+        
+    def approach(self, target: Poi):
+        
+        print(f"You approach {article(target.name)} {target.name}")
+        target.print_visable()
+
+        if len(target.child_pois) > 0:
+            while True:                
+                input_handler_return_value = input_handler(target)
+
+    def save_data(self):
+        write_to_file(self.data_file_name, self.data)
 
 
 main_room = Room("room_example.json")
+
+
+player = Player("player_data.json")
+
+player.approach(main_room)
 
 main_room.save_data()
