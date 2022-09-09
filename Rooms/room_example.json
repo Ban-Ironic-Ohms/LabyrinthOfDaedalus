@@ -1,113 +1,113 @@
 {
-    "name": "jungle",
-    "id": "00000000000000000000000000000001",
-    "value": 0,
-    "class": [
-        "room"
-    ],
-    "url": "https://example.com/room/00000000000000000000000000000001",
-    "descriptions": {
-        "main_description": "jungle forest with tall trees and running water",
-        "door_description": "mossy stone with obsidian handle"
-    },
-    "doors": {
-        "door 1": {
-            "url": "https://example.com/room/00000000000000000000000000000002",
-            "file_name": "room_example_connector"
-        }
-    },
-    "entities": {
-        "slime": {
-            "name": "Green Slime",
-            "hp": -8,
-            "dmg": 3,
-            "descriptions": {
-                "main_description": "An orb of green gelatinous substance with random objects stuck inside it.",
-                "attack_description": "hurls a glob of goo at you."
-            },
-            "class": [
-                "enemy",
-                "container",
-                "melee"
-            ],
-            "passive_perception": 15
-        }
-    },
-    "poi": {
-        "waterfall": {
-            "name": "waterfall",
-            "descriptions": {
-                "main_description": "a waterfall cascades down the cliff face"
-            },
-            "class": [
-                "container"
-            ],
-            "poi": {
-                "chest": {
-                    "name": "chest",
-                    "descriptions": {
-                        "main_description": "a wooden chest with a lock"
-                    },
-                    "class": [
-                        "container"
-                    ],
-                    "poi": {
-                        "key": {
-                            "name": "Jade Key",
-                            "descriptions": {
-                                "main_description": "a small jade key"
-                            },
-                            "class": [
-                                "collectable"
-                            ],
-                            "rarity": 10
-                        },
-                        "gold": {
-                            "name": "Small Pile of Gold",
-                            "descriptions": {
-                                "main_description": "a small pile of gold"
-                            },
-                            "class": [
-                                "collectable"
-                            ],
-                            "rarity": 5,
-                            "value": 10
-                        },
-                        "sword": {
-                            "name": "Iron short sword",
-                            "descriptions": {
-                                "main_description": "A glinting metal sword"
-                            },
-                            "class": [
-                                "collectable"
-                            ],
-                            "rarity": 4,
-                            "value": 25
-                        }
-                    }
-                }
-            }
-        },
-        "key": {
-            "name": "common key",
-            "descriptions": {
-                "main_description": "a key made of gold sitting on the ground"
-            },
-            "class": [
-                "collectable"
-            ],
-            "rarity": 1
-        },
-        "potion": {
-            "name": "healing potion",
-            "descriptions": {
-                "main_description": "a potion of healing"
-            },
-            "class": [
-                "collectable"
-            ],
-            "rarity": 9,
-            "effect": "heal"
-        }
+  "name": "jungle",
+  "id": "00000000000000000000000000000001",
+  "value": 0,
+  "class": [
+    "room"
+  ],
+  "url": "https://example.com/room/00000000000000000000000000000001",
+  "descriptions": {
+    "main_description": "jungle forest with tall trees and running water",
+    "door_description": "mossy stone with obsidian handle"
+  },
+  "doors": {
+    "door 1": {
+      "url": "https://example.com/room/00000000000000000000000000000002",
+      "file_name": "room_example_connector"
     }
+  },
+  "entities": {
+    "slime": {
+      "name": "Green Slime",
+      "hp": -8,
+      "dmg": 3,
+      "descriptions": {
+        "main_description": "An orb of green gelatinous substance with random objects stuck inside it.",
+        "attack_description": "hurls a glob of goo at you."
+      },
+      "class": [
+        "enemy",
+        "container",
+        "melee"
+      ],
+      "passive_perception": 15
+    }
+  },
+  "poi": [
+    {
+      "name": "waterfall",
+      "descriptions": {
+        "main_description": "a waterfall cascades down the cliff face"
+      },
+      "class": [
+        "container"
+      ],
+      "poi": [
+        {
+          "name": "chest",
+          "descriptions": {
+            "main_description": "a wooden chest with a lock"
+          },
+          "class": [
+            "container"
+          ],
+          "poi": [
+            {
+              "name": "Jade Key",
+              "descriptions": {
+                "main_description": "a small jade key"
+              },
+              "class": [
+                "item"
+              ],
+              "rarity": 10
+            },
+            {
+              "name": "Small Pile of Gold",
+              "descriptions": {
+                "main_description": "a small pile of gold"
+              },
+              "class": [
+                "item"
+              ],
+              "rarity": 5,
+              "value": 10
+            },
+            {
+              "name": "Iron short sword",
+              "descriptions": {
+                "main_description": "A glinting metal sword"
+              },
+              "class": [
+                "item"
+              ],
+              "rarity": 4,
+              "value": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "common key",
+      "descriptions": {
+        "main_description": "a key made of gold sitting on the ground"
+      },
+      "class": [
+        "item"
+      ],
+      "rarity": 1
+    },
+    {
+      "name": "healing potion",
+      "descriptions": {
+        "main_description": "a potion of healing"
+      },
+      "class": [
+        "item"
+      ],
+      "rarity": 9,
+      "effect": "heal"
+    }
+  ]
 }
