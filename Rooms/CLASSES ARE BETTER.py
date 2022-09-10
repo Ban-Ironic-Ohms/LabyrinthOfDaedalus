@@ -1,8 +1,21 @@
 from __future__ import annotations
+import sys
+sys.path.append("./")
+
 import json
 import random
 from helper_functions import article
+from firebase_interface import Firebase
 
+database = Firebase(reset=False)
+
+
+# NOTE: This way is being deprecated in favor of the class based approach
+# In order to work with the firebase database, we need to use different functions for rooms and users
+# They will live in the parent for each, so just use 
+# super().load_room()        super().load_user()
+# super().save_room()        super().save_user()
+"""
 def load_file(file_name: str) -> dict:
     with open(file_name, "r") as f:
         return json.load(f)
@@ -10,6 +23,7 @@ def load_file(file_name: str) -> dict:
 def write_to_file(file_name: str, data: dict):
     with open(file_name, "w") as f:
         return json.dump(data, f)
+"""
 
 def input_handler(dataset, message: str = "> "):
     input_command = input(message)
@@ -58,7 +72,6 @@ class Descriptions:
         self.attack = attack_description
         self.door = door_description
 
-
 class Poi:
     @staticmethod
     def get_poi(poi_data, parent_poi=None):
@@ -79,6 +92,13 @@ class Poi:
         else:
             self.child_pois = []
 
+    # load and save functions to firebase
+    def load_room(self, id) -> dict:
+        return database.get_room(id)
+    
+    def save_room(self, id, data: dict):
+        database.set_room(id, data)
+    
     @property
     def name(self):
         return self.data["name"]
@@ -159,15 +179,15 @@ class Poi:
             self.parent_poi.save_data()
 
 class Room(Poi):
-    def __init__(self, data_file_name, room_data=None, **kwargs):
+    def __init__(self, id, room_data=None, **kwargs):
         if room_data is None:
-            room_data = load_file(data_file_name)
-        self.data_file_name = data_file_name
+            room_data = super().load_room(id)
+        self.id = id
         super().__init__(room_data, **kwargs)
 
     def save_data(self):
         self.refresh_child_pois()
-        write_to_file(self.data_file_name, self.data)
+        super().save_room(self.id, self.data)
 
 class Entity(Poi):
     def __init__(self, *args, **kwargs):
@@ -224,13 +244,20 @@ class Enemy(Entity):
             print(f"You have {player.hp} hp left. ({prev_player_hp} - {self.dmg})")
 
 class Player:
-    def __init__(self, data_file_name, player_data: dict = None):
-        self.data_file_name = data_file_name
+    def __init__(self, id, player_data: dict = None):
+        self.id = id
         if player_data:
             self.data = player_data
         else:
-            self.data = load_file(data_file_name)
+            self.data = self.load_player(id)
 
+    # load and save functions to firebase
+    def load_player(self, id):
+        return database.get_player(id)
+    
+    def save_player(self, id):
+        database.save_player(id, self.data)
+    
     @property
     def inventory(self):
         return self.data["inventory"]
@@ -302,13 +329,12 @@ class Player:
                 input_handler_return_value = input_handler(target)
 
     def save_data(self):
-        write_to_file(self.data_file_name, self.data)
+        self.save_player(self.id, self.data)
 
 
-main_room = Room("room_example.json")
+main_room = Room("00000000000000000000000000000001")
 
-
-player = Player("player_data.json")
+player = Player("0000000000000000")
 
 player.approach(main_room)
 
