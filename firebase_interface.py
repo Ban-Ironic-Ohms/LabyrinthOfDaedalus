@@ -13,7 +13,7 @@ firebase_admin.initialize_app(cred, {
 })
     
 class Firebase:
-    def __init__(self, reset=False, base=True):
+    def __init__(self, base_rooms=["room_example.json", "room_example_connector.json"], base_players=["player_data.json"], reset=False, base=True):
         if reset:
             with open("Firebase/init.json") as file:
                 data = json.load(file)
@@ -22,16 +22,19 @@ class Firebase:
             ref.set(data)
             
             if base:
-                with open("Rooms/room_example.json") as file:
-                    rm_ex = json.load(file)
-                with open("Rooms/room_example_connector.json") as file:
-                    rm_ex_con = json.load(file)
-                with open("Rooms/player_data.json") as file:
-                    player = json.load(file)
-                self.set_room(rm_ex)
-                self.set_room(rm_ex_con)
+                rooms = []
+                for i in base_rooms:
+                    with open('Rooms/' + i) as file:
+                        rooms.append(json.load(file))
+                players = []
+                for i in base_players:
+                    with open('Players/' + i) as file:
+                        players.append(json.load(file))
                 
-                self.add_player(player)
+                for i in rooms:
+                    self.set_room(i)
+                for i in players:
+                    self.set_player(i)
 
     # note: if there is a room with the same ID, it will overide it
     # if force=True, it will overide, otherwise it will error
@@ -57,7 +60,7 @@ class Firebase:
         ref = db.reference('/rooms/' + str(id))
         return ref.get()
     
-    def add_player(self, data, force=False):
+    def set_player(self, data, force=False):
         if type(data) == dict:
             id = data["id"]
             new = db.reference('/users/' + str(id))
