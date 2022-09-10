@@ -1,14 +1,61 @@
 # Thanks to github.com/mdrkb for this template. I could not find documentation for this
+from xml.dom import ValidationErr
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+import json
 
 # Fetch the service account key JSON file contents
-cred = credentials.Certificate('firebase-adminsdk.json')
+cred = credentials.Certificate('firebase-keys.json')
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://<your_app_name>.firebaseio.com/'
+    'databaseURL': 'https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/'
 })
+
+
+# initalize
+def init():
+    with open("Firebase/init.json") as file:
+        data = json.load(file)
+
+    ref = db.reference('/')
+    ref.set(data)
+
+class Firebase:
+    def __init__(self) -> None:
+        pass
+
+    # note: if there is a room with the same ID, it will overide it
+    # if force=True, it will overide, otherwise it will error
+    def set_room(self, data, force=False):
+        if type(data) == dict:
+            id = data["id"]
+            new = db.reference('/rooms/' + str(id))
+            if force == True:
+                new.set(data)
+            else:
+                if new.get():
+                    raise ValidationErr("there is already a room with this id")
+                else:
+                    new.set(data)
+        else:
+            raise TypeError("please serialize the data into a dict")
+    
+    # literally just the same as set room, but forces overide
+    def save_room(self, data):
+        self.set_room(data, True)
+    
+
+
+database = Firebase()
+with open("Rooms/room_example.json") as f:
+    p = json.load(f)
+    
+
+database.set_room(p)
+# init()
+
+"""
 
 # Save data
 ref = db.reference('/')
@@ -37,6 +84,13 @@ ref.set(
             }
     }
 )
+
+
+
+
+
+
+
 
 # Update data
 ref = db.reference('boxes')
@@ -141,3 +195,4 @@ ref = db.reference('boxes')
 snapshot = ref.order_by_child('length').equal_to(3).get()
 for key in snapshot:
     print(key)
+    """
