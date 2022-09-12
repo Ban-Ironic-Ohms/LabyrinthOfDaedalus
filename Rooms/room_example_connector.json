@@ -10,6 +10,8 @@
     },
     "doors": {
         "door 1": {
+            "name": "door 1",
+            "id": "00000000000000000000000000000001",
             "url": "https://example.com/door/00000000000000000000000000000001",
             "file_name": "room_example"
         }

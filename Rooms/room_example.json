@@ -12,6 +12,8 @@
   },
   "doors": {
     "door 1": {
+      "name": "door 1",
+      "id": "00000000000000000000000000000002",
       "url": "https://example.com/room/00000000000000000000000000000002",
       "file_name": "room_example_connector"
     }

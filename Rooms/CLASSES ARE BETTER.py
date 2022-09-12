@@ -1,4 +1,5 @@
 from __future__ import annotations
+import re
 import sys
 sys.path.append("./")
 
@@ -79,7 +80,7 @@ class Descriptions:
         self.attack = attack_description
         self.door = door_description
 
-class Poi:
+class Poi:            
     @staticmethod
     def get_poi(poi_data, parent_poi=None):
         if "room" in poi_data["class"]:
@@ -190,11 +191,38 @@ class Room(Poi):
         if room_data is None:
             room_data = super().load_room(id)
         self.id = id
-        super().__init__(room_data, **kwargs)
+        self.doors = []
+        for door in room_data["doors"]:
+            self.doors.append(Door(door, room_data["doors"][door]["id"]))
 
+    def print_doors(self):
+        # print(self.doors, type(self.doors))
+        for door in self.doors:
+            print(door)
+                
     def save_data(self):
         self.refresh_child_pois()
         super().save_room(self.id, self.data)
+        
+    def print_room(self):
+        print(f"{self.name}:")
+
+            
+class Door(Poi):
+    def __init__(self, name, id):
+        self._name = name
+        self._id = id
+    
+    @property
+    def name(self):
+        return self._name
+    
+    @property
+    def id(self):
+        return self._id
+    
+    def __str__(self):
+        return(f"{self._name} {self._id}")
 
 class Entity(Poi):
     def __init__(self, *args, **kwargs):
@@ -327,6 +355,9 @@ class Player:
         print(f"It has {enemy.hp} hp left. ({old_enemy_hp} - {self.dmg})")
         
     def approach(self, target: Poi):
+        
+        if type(target) == Room:
+            target.print_doors()
         
         print(f"You approach {article(target.name)} {target.name}")
         target.print_visable()
