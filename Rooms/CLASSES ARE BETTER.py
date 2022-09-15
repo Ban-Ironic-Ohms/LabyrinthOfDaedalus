@@ -194,9 +194,9 @@ class Room(Poi):
         self.doors = []
         for door in room_data["doors"]:
             self.doors.append(Door(door, room_data["doors"][door]["id"]))
-
+        super().__init__(room_data, **kwargs)
+        
     def print_doors(self):
-        # print(self.doors, type(self.doors))
         for door in self.doors:
             print(door)
                 
