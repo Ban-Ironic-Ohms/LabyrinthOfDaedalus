@@ -1,6 +1,30 @@
 
-document.querySelector("#Input").addEventListener("change", Set, true)
+// document.querySelector("#Input").addEventListener("input", Set, true)
 
-function Set() {
-    document.querySelector("#Show").innerHTML = document.querySelector('#Input').value;
+// function Set() {
+//     document.querySelector("#Show").innerHTML = document.querySelector('#Input').value;
+// }
+
+
+
+class Poi {
+    constructor() {
+        this.child_pois = [];
+    }
 }
+
+room = new Poi();
+
+function ShowPoi(poi) {
+    const template = document.createElement('div');
+    template.style.height = "97vh";
+    template.style.width = String(25) + "%";
+    //template.style.marginTop = "100px";
+    template.style.color = "green"; 
+    template.style.backgroundColor = "orange";
+    template.innerHTML = "Content inside DIV";
+
+    document.body.appendChild(template);
+}
+
+ShowPoi(room);
