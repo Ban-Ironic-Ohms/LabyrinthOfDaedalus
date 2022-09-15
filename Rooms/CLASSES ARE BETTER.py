@@ -63,6 +63,11 @@ def input_handler(dataset, message: str = "> "):
     # todo back
     
     # todo go to doors
+    elif input_command in [door.name for door in dataset.doors]:
+        for door in dataset.doors:
+            if door.name == input_command:
+                player.approach(Room(door.id))
+    
     
     elif input_command in dataset.child_pois:
         print(dataset.child_pois[input_command].description)
@@ -221,8 +226,12 @@ class Door(Poi):
     def id(self):
         return self._id
     
+    def get_door_desc(self):
+        return database.get_room(self._id)["descriptions"]["door_description"]
+    
     def __str__(self):
-        return(f"{self._name} {self._id}")
+        # print name, id, and door description
+        return(f"{self._name} - {self.get_door_desc()}")
 
 class Entity(Poi):
     def __init__(self, *args, **kwargs):
