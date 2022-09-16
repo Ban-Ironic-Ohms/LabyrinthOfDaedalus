@@ -1,5 +1,5 @@
 
-document.querySelector("#input").addEventListener("input", Set, true)
+// document.querySelector("#input_jkl").addEventListener("input", Set, true)
 
 // function Set() {
 //     document.querySelector("#Show").innerHTML = document.querySelector('#Input').value;

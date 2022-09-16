@@ -15,7 +15,7 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 const db = getDatabase();
-const rooms_ref = ref(db, 'rooms/');
+const rooms_ref = ref(db, '/');
 onValue(rooms_ref, (snapshot) => {
   const data = snapshot.val();
   update_room(data);
@@ -23,5 +23,14 @@ onValue(rooms_ref, (snapshot) => {
 
 function update_room(data) {
   console.log(data);
-  document.getElementById("rooms_lll").innerHTML = data;
+  document.getElementById("rooms_lll").innerHTML = JSON.stringify(data);
+}
+
+document.querySelector("#submit_changes").addEventListener("click", Set, true)
+
+
+function Set() {
+  const main_ref = ref(database, '/');
+  // firebase set function on the text inputted to the input field
+  set(main_ref, document.querySelector('#input_jkl').value);
 }
