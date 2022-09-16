@@ -1,5 +1,5 @@
 
-// document.querySelector("#Input").addEventListener("input", Set, true)
+document.querySelector("#input").addEventListener("input", Set, true)
 
 // function Set() {
 //     document.querySelector("#Show").innerHTML = document.querySelector('#Input').value;
@@ -21,7 +21,7 @@ function ShowPoi(poi) {
     //template.style.marginTop = "100px";
     template.style.color = "green"; 
     template.style.backgroundColor = "orange";
-    template.innerHTML = "Content inside DIV";
+    template.innerHTML = "Test POI";
 
     document.body.appendChild(template);
 }
