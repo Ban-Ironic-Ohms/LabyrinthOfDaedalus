@@ -1,3 +1,4 @@
 .idea
 Rooms/__pycache__
 firebase-keys.json
+/node_modules
