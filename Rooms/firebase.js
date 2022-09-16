@@ -1,7 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-
-console.log("something is happening")
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
 
 
 // TODO: Replace the following with your app's Firebase project configuration
@@ -16,15 +14,14 @@ const app = initializeApp(firebaseConfig);
 // Initialize Realtime Database and get a reference to the service
 const database = getDatabase(app);
 
-
-
 const db = getDatabase();
-const rooms_ref = ref(db, 'rooms');
+const rooms_ref = ref(db, 'rooms/');
 onValue(rooms_ref, (snapshot) => {
   const data = snapshot.val();
   update_room(data);
 });
 
 function update_room(data) {
-    document.getElementById("rooms").innerHTML = data;
+  console.log(data);
+  document.getElementById("rooms_lll").innerHTML = data;
 }
