@@ -1,0 +1,30 @@
+-- Descriptions of all classes of POIs and their functionalities and values --
+
+base poi (no classes):
+ - name (str): The name of the poi
+ - descriptions (dict):
+   - main_description (str): The description of when the player views this poi
+ - class (list): All classes of this poi
+
+
+"connector" class: Makes the poi a connection between rooms that can be used or entered
+ - descriptions (dict):
+   - unlock (str): What is prompted to players to unlock this connection
+   - enter (str): What is prompted to players to enter/use this connection
+ - id (str)
+ - url (str)
+ - filename (str)
+
+
+"door" class: Makes the poi a door. Must also have "connector" class
+ - descriptions (dict):
+   - unlock (str): What is prompted to players to unlock this connection. Defaults to "Unlock".
+   - enter (str): What is prompted to players to enter/use this connection. Defaults to "Enter"
+
+
+"enemy" class:
+
+
+"container" class:
+
+...

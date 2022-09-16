@@ -1,14 +1,9 @@
 from __future__ import annotations
-import re
-import sys
-sys.path.append("./")
-
-import json
+import os
+os.chdir("../")
 import random
 from helper_functions import article
 from firebase_interface import Firebase
-
-
 # LOOK AT THIS!!!!!!
 # This is kinda important
 # if you want to add more rooms that you want to use, this is where
@@ -16,7 +11,6 @@ from firebase_interface import Firebase
 base_rooms = ["room_example.json", "room_example_connector.json"]
 base_players = ["player_data.json"]
 database = Firebase(base_rooms=base_rooms, base_players=base_players, reset=True)
-
 
 # NOTE: This way is being deprecated in favor of the class based approach
 # In order to work with the firebase database, we need to use different functions for rooms and users
@@ -33,7 +27,7 @@ def write_to_file(file_name: str, data: dict):
         return json.dump(data, f)
 """
 
-def input_handler(dataset, message: str = "> "):
+def input_handler(current_poi, player, message: str = "> "):
     input_command = input(message)
     input_command = input_command.lower()
     
@@ -45,67 +39,73 @@ def input_handler(dataset, message: str = "> "):
         print(" - inspect")
         print(" - inventory")
         print(" - door #")
-        input_handler(dataset=dataset)
+        input_handler(current_poi, player)
 
     elif input_command == "exit":
         exit()
 
     # this needs to be changed to print just the visible items - not sure what fnc to use
     elif input_command in ["inspect", "info", "look"]:
-        dataset.print_visable()
+        current_poi.print_visible()
         
-    elif input_command in [child_poi_but_i_need_the_name.name for child_poi_but_i_need_the_name in dataset.child_pois]:
-        for child_poi_that_we_might_want in dataset.child_pois:
-            if child_poi_that_we_might_want.name == input_command:
-                player.approach(child_poi_that_we_might_want)
+    elif input_command in [child_poi.name for child_poi in current_poi.child_pois]:
+        for child_poi in current_poi.child_pois:
+            if child_poi.name == input_command:
+                player.approach(child_poi)
                 return
 
     # todo back
     
     # todo go to doors
     
-    elif input_command in dataset.child_pois:
-        print(dataset.child_pois[input_command].description)
-        input_handler(dataset=dataset.child_pois[input_command])
+    elif input_command in current_poi.child_pois:
+        print(current_poi.child_pois[input_command].description)
+        input_handler(current_poi.child_pois[input_command], player)
 
     else:
-        print(dataset.child_pois)
+        print("Invalid command - Type help for valid commands")
         return input_command
     
 class Descriptions:
     DEFAULT = "unimplemented description"
 
-    def __init__(self, main_description=DEFAULT, attack_description=DEFAULT, door_description=DEFAULT):
+    def __init__(self,
+                 main_description=DEFAULT,
+                 attack_description=DEFAULT,
+                 door_description=DEFAULT,
+                 unlock_description=DEFAULT,
+                 enter_description=DEFAULT):
         self.main = main_description
         self.attack = attack_description
         self.door = door_description
+        self.unlock = unlock_description
+        self.enter = enter_description
 
 class Poi:            
     @staticmethod
     def get_poi(poi_data, parent_poi=None):
-        if "room" in poi_data["class"]:
-            return Room(poi_data, parent_poi)
-        if "enemy" in poi_data["class"]:
+        poi_class = poi_data["class"]
+
+        if "room" in poi_class:
+            return Room(poi_data, poi_data)
+        elif "connector" in poi_class:
+            return Connector(poi_data, parent_poi)
+        elif "enemy" in poi_class:
             return Enemy(poi_data, parent_poi)
         else:
-            return Entity(poi_data, parent_poi)
+            return Poi(poi_data, parent_poi)
 
     def __init__(self, poi_data: dict, parent_poi: Poi | None = None):
         self.data = poi_data
         self.parent_poi = parent_poi
 
-        if "poi" in self.data:
-            self.child_pois = [self.get_poi(child_poi_data, parent_poi=self) for
-                               child_poi_data in self.data["poi"]]
-        else:
-            self.child_pois = []
-
-    # load and save functions to firebase
-    def load_room(self, id) -> dict:
-        return database.get_room(id)
-    
-    def save_room(self, id, data: dict):
-        database.set_room(id, data)
+        self.child_pois = []
+        self.doors = []
+        for child_poi_data in self.data["poi"] if "poi" in self.data else []:
+            new_child_poi = self.get_poi(child_poi_data, parent_poi=self)
+            self.child_pois.append(new_child_poi)
+            if "door" in child_poi_data["class"]:
+                self.doors.append(new_child_poi)
     
     @property
     def name(self):
@@ -123,7 +123,7 @@ class Poi:
         for child_poi in self.child_pois:
             child_poi.print_poi(level + 1)
             
-    def print_visable(self, level=0):
+    def print_visible(self):
         if (length := len(self.child_pois)) > 0:
             print("You see ", end="")
             for ind, item in enumerate(self.child_pois):
@@ -139,7 +139,6 @@ class Poi:
             print("What would you like to do?")
         else:
             print("What would you like to look at?")
-
 
     @property
     def descriptions(self):
@@ -159,7 +158,7 @@ class Poi:
             print("You see ", end="")
         for ind, item in enumerate(self.child_pois):
             to_print = "and " if ind == length - 1 and length > 1 else ""
-            to_print += f"{article(item)} {item}"
+            to_print += f"{article(item.name)} {item.name}"
             to_print += ".\n" if ind == length - 1 else ","
             print(to_print, end="")
 
@@ -179,50 +178,55 @@ class Poi:
     def refresh_child_pois(self):
         self.data["poi"] = [child_poi.data for child_poi in self.child_pois]
 
-    def save_data(self):
+    def save_data_to_database(self):
         self.refresh_child_pois()
         if self.parent_poi is None:
-            raise TypeError("This poi is not contained within a room")
+            raise TypeError("This poi is not contained under a room")
         else:
-            self.parent_poi.save_data()
-
-class Room(Poi):
-    def __init__(self, id, room_data=None, **kwargs):
-        if room_data is None:
-            room_data = super().load_room(id)
-        self.id = id
-        self.doors = []
-        for door in room_data["doors"]:
-            self.doors.append(Door(door, room_data["doors"][door]["id"]))
+            self.parent_poi.save_data_to_database()
 
     def print_doors(self):
-        # print(self.doors, type(self.doors))
         for door in self.doors:
             print(door)
-                
-    def save_data(self):
+
+class Room(Poi):
+    @property
+    def id(self):
+        return self.data["id"]
+
+    # load and save functions to firebase
+    @staticmethod
+    def load_data_from_database(room_id) -> dict:
+        return database.get_room(room_id)
+
+    def save_data_to_database(self):
         self.refresh_child_pois()
-        super().save_room(self.id, self.data)
+        database.set_room(self.data)
         
     def print_room(self):
         print(f"{self.name}:")
 
             
-class Door(Poi):
-    def __init__(self, name, id):
-        self._name = name
-        self._id = id
-    
-    @property
-    def name(self):
-        return self._name
-    
+class Connector(Poi):
     @property
     def id(self):
-        return self._id
-    
+        return self.data["id"]
+
+    @property
+    def descriptions(self):
+        default_descriptions = {
+            "unlock": "Unlock",
+            "enter": "Enter"
+        } if "door" in self.cls else {}
+        # Unpack default_descriptions first so that it is overridden by any descriptions in data
+        return Descriptions(**{**default_descriptions, **self.data["descriptions"]})
+
+    def get_door_desc(self):
+        return database.get_room(self.id)["descriptions"]["door_description"]
+
     def __str__(self):
-        return(f"{self._name} {self._id}")
+        # print name, id, and door description
+        return f"{self.name} - {self.get_door_desc()}"
 
 class Entity(Poi):
     def __init__(self, *args, **kwargs):
@@ -258,7 +262,7 @@ class Enemy(Entity):
 
         while True:
             print("What do you do?")
-            input_handler_return_value = input_handler(self)
+            input_handler_return_value = input_handler(self, player)
             if input_handler_return_value == "attack":
                 player.attack_enemy(self)
             elif input_handler_return_value in ["run", "flee", "escape", "back", "back down", "back away", "retreat"]:
@@ -279,23 +283,24 @@ class Enemy(Entity):
             print(f"You have {player.hp} hp left. ({prev_player_hp} - {self.dmg})")
 
 class Player:
-    def __init__(self, id, player_data: dict = None):
-        self.id = id
-        if player_data:
-            self.data = player_data
-        else:
-            self.data = self.load_player(id)
+    def __init__(self, player_data: dict):
+        self.data = player_data
 
     # load and save functions to firebase
-    def load_player(self, id):
-        return database.get_player(id)
+    @staticmethod
+    def load_data_from_database(player_id):
+        return database.get_player(player_id)
     
-    def save_player(self, id):
-        database.save_player(id, self.data)
+    def save_data_to_database(self):
+        database.save_player(self.data)
     
     @property
     def inventory(self):
         return self.data["inventory"]
+
+    @property
+    def id(self):
+        return self.data["id"]
 
     @inventory.setter
     def inventory(self, value):
@@ -350,30 +355,30 @@ class Player:
         print(self.descriptions.attack)
         old_enemy_hp = enemy.hp
         enemy.hp -= self.dmg
-        # enemy.save_data()
+        # enemy.save_data_to_database()
         print(f"You hit and deal {self.dmg} to the {enemy.name}.")
         print(f"It has {enemy.hp} hp left. ({old_enemy_hp} - {self.dmg})")
         
     def approach(self, target: Poi):
-        
-        if type(target) == Room:
+        if isinstance(target, Room):
             target.print_doors()
         
         print(f"You approach {article(target.name)} {target.name}")
-        target.print_visable()
+        target.print_visible()
 
         if len(target.child_pois) > 0:
             while True:                
-                input_handler_return_value = input_handler(target)
+                _input_handler_return_value = input_handler(target, self)
 
-    def save_data(self):
-        self.save_player(self.id, self.data)
+def main():
+    main_room = Room(Room.load_data_from_database("00000000000000000000000000000001"))
+
+    player = Player(Player.load_data_from_database("0000000000000000"))
+
+    player.approach(main_room)
+
+    # main_room.save_data_to_database()
 
 
-main_room = Room("00000000000000000000000000000001")
-
-player = Player("0000000000000000")
-
-player.approach(main_room)
-
-main_room.save_data()
+if __name__ == "__main__":
+    main()
