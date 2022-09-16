@@ -63,19 +63,19 @@ def input_handler(dataset, message="> "):
 
     elif input_command == "exit":
         exit()
-        
+
     elif input_command == "back":
         increase_cur_noise_level(2, dataset)
         if "collectible" in dataset["class"]:
             return
         return "back"
-    
+
     # room commands
     elif input_command in data["doors"]:
         dataset = load_room(data["doors"][input_command]["file_name"])
-        print_doors(dataset) 
+        print_doors(dataset)
         approach(dataset)
-    
+
     # enemy combat
     if "enemy" in dataset["class"]:
         if input_command in ["attack", "fight"]:
@@ -83,21 +83,21 @@ def input_handler(dataset, message="> "):
 
         elif input_command == "run":
             return "run"
-        
+
         else:
             print(f"You can't use {input_command} in combat")
             return
-        
+
     # take item
     elif input_command in ["take", "grab"]:
         increase_cur_noise_level(5, dataset)
         return add_item_to_inventory(dataset)
-    
+
     # approach
     elif input_command in dataset["poi"]:
         increase_cur_noise_level(2, dataset)
         return approach(dataset["poi"][input_command])
-    
+
     # approach if there is only 1 poi
     elif len(dataset["poi"]) == 1:
         if input_command in ["look", "inspect", "open", "examine", "go"]:
@@ -108,22 +108,22 @@ def input_handler(dataset, message="> "):
         print_doors(dataset)
         describe_poi(dataset)
         return input_handler(dataset=dataset)
-        
+
     elif input_command == "inventory":
         increase_cur_noise_level(1, dataset)
         print("inventory")
-        
+
     else:
         print('invalid command - type "help" for a list of commands')
         input_handler(dataset=dataset)
 
 
-# TODO: Convert to classes
+# Converted to classes
 def approach(dataset):
     if "poi" in dataset:
-        while True: 
+        while True:
             describe_poi(dataset=dataset)
-            
+
             input_handler_return_value = input_handler(dataset=dataset)
             if input_handler_return_value == "back":
                 break
@@ -143,20 +143,20 @@ def approach(dataset):
         return input_handler(dataset=dataset)
 
 
-# TODO: Convert to classes
+# Converted to classes
 def add_item_to_inventory(item_data: dict):
     # check if you can take target item
     if "collectible" not in item_data["class"]:
         print(f"You can't put {article(item_data['name'])} {item_data['name']} in your inventory!")
         return None
-    
+
     # tell player they got the item
     name = item_data["name"]
     print(f"You have acquired {article(name)} {name}")
-    
+
     # add to inventory
     player_data["inventory"][name] = item_data
-    
+
     # save to player data file
     with open("player_data.json", "w") as f:
         json.dump(player_data, f)
@@ -169,7 +169,7 @@ def increase_cur_noise_level(volume_increase, dataset=data):
     with open("player_data.json", "w") as f:
         json.dump(player_data, f)
 
-    
+
     for i in dataset["entities"]:
         if int(dataset["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"]):
             combat(dataset["entities"][i])
@@ -201,7 +201,7 @@ def combat(enemy_data):
                 exit()
                 break
             print("You attempt to flee the room, but fail to escape!")
-        
+
         if enemy_data["hp"] <= 0:
             print(f"{enemy_data['name']} has been defeated!")
             break

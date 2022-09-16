@@ -2,7 +2,7 @@ from rooms.poi import Room
 from player.player import Player
 from firebase.firebase_interface import Firebase
 
-def input_handler(current_poi, player, message: str = "> "):
+def input_handler(current_poi, player: Player, message: str = "> "):
     input_command = input(message)
     input_command = input_command.lower()
 
@@ -26,7 +26,7 @@ def input_handler(current_poi, player, message: str = "> "):
     elif input_command in [child_poi.name for child_poi in current_poi.child_pois]:
         for child_poi in current_poi.child_pois:
             if child_poi.name == input_command:
-                player.approach(child_poi)
+                player.approach(child_poi, input_handler)
                 return
 
     # todo back

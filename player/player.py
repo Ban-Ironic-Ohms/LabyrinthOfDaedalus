@@ -68,19 +68,22 @@ class Player:
     def noise_level(self, value):
         self.data["cur_noise_level"] = value
 
+        # TODO: Implement enemies detecting players:
+        # for i in dataset["entities"]:
+        #     if int(dataset["entities"][i]["passive_perception"]) <= int(player_data["cur_noise_level"]):
+        #         combat(dataset["entities"][i])
+
     # TODO: Don't use dictionaries to store child_pois in json. We have no use for the keys,
     #  and duplicate keys could be really bad. Starts to get rly bad when you transferring items between rooms.
 
     def add_to_inventory(self, item: Poi):
-        name = item.name
-
         # check if you can take target item
         if "item" not in item.cls:
-            print(f"You can't put {article(name)} {name} in your inventory!")
+            print(f"You can't put {article(item.name)} {item.name} in your inventory!")
             return None
 
         # tell player they got the item
-        print(f"You have acquired {article(name)} {name}")
+        print(f"You have acquired {article(item.name)} {item.name}")
 
         # add to inventory
         self.inventory.append(item.data)
@@ -102,4 +105,4 @@ class Player:
 
         if len(target.child_pois) > 0:
             while True:
-                _input_handler_return_value = input_handler(target, self)
+                input_handler_return_value = input_handler(target, self)
