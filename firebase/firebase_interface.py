@@ -18,7 +18,7 @@ class Firebase:
                  base_players=("player_data.json",),
                  reset=False, base=True):
         if reset:
-            with open("Firebase/init.json") as file:
+            with open("firebase/init.json") as file:
                 data = json.load(file)
 
             ref = db.reference('/')
@@ -27,11 +27,11 @@ class Firebase:
             if base:
                 rooms = []
                 for i in base_rooms:
-                    with open('Rooms/' + i) as file:
+                    with open('rooms/' + i) as file:
                         rooms.append(json.load(file))
                 players = []
                 for i in base_players:
-                    with open('Players/' + i) as file:
+                    with open('player/' + i) as file:
                         players.append(json.load(file))
                 
                 for i in rooms:

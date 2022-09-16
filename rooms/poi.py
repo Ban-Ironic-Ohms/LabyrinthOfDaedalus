@@ -7,7 +7,7 @@ from firebase_interface import Firebase
 # LOOK AT THIS!!!!!!
 # This is kinda important
 # if you want to add more rooms that you want to use, this is where
-# you add them by adding the file name to the list. Make sure rooms are in the Rooms folder and player are in the Players folder
+# you add them by adding the file name to the list. Make sure rooms are in the rooms folder and player are in the player folder
 base_rooms = ["room_example.json", "room_example_connector.json"]
 base_players = ["player_data.json"]
 database = Firebase(base_rooms=base_rooms, base_players=base_players, reset=True)
