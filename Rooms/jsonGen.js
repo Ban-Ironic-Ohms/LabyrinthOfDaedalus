@@ -6,7 +6,6 @@
 // }
 
 
-
 class Poi {
     constructor() {
         this.child_pois = [];
