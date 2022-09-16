@@ -57,7 +57,11 @@ def input_handler(current_poi, player, message: str = "> "):
     # todo back
     
     # todo go to doors
-    
+    elif input_command in [door.name for door in current_poi.doors]:
+        for door in current_poi.doors:
+            if door.name == input_command:
+                player.approach(Room(door.id))
+
     elif input_command in current_poi.child_pois:
         print(current_poi.child_pois[input_command].description)
         input_handler(current_poi.child_pois[input_command], player)

@@ -1,0 +1,5 @@
+firebase-keys.json
+__pycache__
+.idea
+Rooms\__pycache__
+.gitignore
