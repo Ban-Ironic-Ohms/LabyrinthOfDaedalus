@@ -19,8 +19,10 @@ class Poi {
             name: null,
             id: null,
             url: null,
-            class: [],
-            descriptions: [],
+            class: classes,
+            descriptions: {
+                main_description: "Pottaonull",
+            },
             rarity: null,
             value: null,
             poi: [],
@@ -45,7 +47,7 @@ function ShowPoi(poi) {
     base.style.width = String(25) + "%";
     base.style.backgroundColor = "gray";
 
-    CreateSection(poi, "Room", base, [["text", "Room Name", "name"], ["text", "Main Description", "descriptions"]]);
+    CreateSection(poi, "Room", base, [["text", "Main Description", poi.data.descriptions.main_description]]);
     //if (poi.classes.includes("room")) {
         
     
@@ -77,7 +79,17 @@ function CreateSection(poi, section_name, parent, items) {
 
 
     for (let i = 0; i < items.length; i++) {
-        poi.data[items[i][2]] = CreateInputField(items[i][1], items[i][0], section_base);
+        field = CreateInputField(items[i][1], items[i][0], section_base);
+
+        this.Yes = function (event, msg) {
+            console.log(event)
+            console.log(msg)
+        }
+        
+        //field.addEventListener("input", this.Yes.bind(this));
+        
+        field.addEventListener("input", this.Yes);
+
     }
     parent.appendChild(section_base);
 }
