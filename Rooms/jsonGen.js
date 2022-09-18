@@ -76,7 +76,7 @@ function ShowPoi(poi) {
     base.style.backgroundColor = "gray";
 
     if (poi.data.class.value.includes("room")) {
-        CreateSection(poi, "Room", base, [["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description]]);
+        CreateSection(poi, "Room", base, [["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description], ["selection", "Class(s)", poi.data.class, ["room", "container", "enemy", "item", "consumable"]]]);
     }
 
     // if (poi.classes.includes("enemy")) {
@@ -107,13 +107,18 @@ function CreateSection(poi, section_name, parent, items) {
 
 
     for (let i = 0; i < items.length; i++) {
-        field = CreateInputField(items[i][1], items[i][0], section_base);
-        
         function save(variable, event) {
             variable.value = event.srcElement.value;
             console.log(poi);
         }
-        field.addEventListener("input", save.bind(this, items[i][2]))
+        
+        if (items[i][0] == "selection") {
+            field = CreateSelectionField(items[i][1], items[i][3], section_base);
+        } 
+        else {
+            field = CreateInputField(items[i][1], items[i][0], section_base);
+            field.addEventListener("input", save.bind(this, items[i][2]))
+        }
     }
     parent.appendChild(section_base);
 }
@@ -134,6 +139,38 @@ function CreateInputField(input_field_name_str, type, parent) {
     input_field.style.marginLeft = "25px"
     input_field.placeholder = input_field_name_str;
     input_field.type = type
+
+    input_field_holder.appendChild(input_field_name);
+    input_field_holder.appendChild(input_field);
+    parent.appendChild(input_field_holder);
+    return input_field_holder;
+}
+
+function CreateSelectionField(select_field_name_str, options, parent) {
+    input_field_holder = document.createElement('div');
+    if (light_gray)
+        input_field_holder.style.backgroundColor = "darkgray" 
+        light_gray = !light_gray;
+
+    input_field_holder.id = "input_field_holder"
+
+    input_field_name = document.createElement('text');
+    input_field_name.style.marginLeft = "25px"
+    input_field_name.innerHTML = select_field_name_str;
+
+    input_field = document.createElement('select');
+    input_field.style.marginLeft = "25px"
+    input_field.multiple = true;
+    input_field.className += "chosen-select";
+    input_field.id = "poi_type";
+    input_field.width = "100px";
+    input_field.placeholder = select_field_name_str;
+
+    for (let i = 0; i < options.length; i++) {
+        new_option = document.createElement("option");
+        new_option.value = options[i];
+        input_field.appendChild(new_option)
+    }
 
     input_field_holder.appendChild(input_field_name);
     input_field_holder.appendChild(input_field);
