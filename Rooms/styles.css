@@ -1,0 +1,13 @@
+.tab1 {
+    margin-left: 40px;
+}
+.number-selector {
+    width: 40px;
+}
+.example {
+    input-security: none;
+}
+.preview {
+    margin-left: 20%;
+    color: rgb(80, 80, 80);
+}

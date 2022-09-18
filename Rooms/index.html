@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="main.js"></script>
+    <title>Labyrinth Of Daedalus</title>
+</head>
+<body>
+    <h1>Lets make a room!</h1>
+    <input type="text" placeholder="room name" id="name">
+    <i>ex. jungle</i>
+    <br>
+
+    <h2>Descriptions</h2>
+    <input type="text" placeholder="main description" id="main_description"> 
+    <i class="example">ex. jungle forest with tall trees and running water</i>
+    <br>
+    <input type="text" placeholder="door description" id="door_description">
+    <i class="example">ex. mossy stone with obsidian handle</i>
+
+    <h2>Doors</h2>
+    Number of doors: <input type="number" class="number-selector" value="1">
+    <br>
+
+    <input type="text" placeholder="id of other room" id="door_name">
+    <i class="example">ex. 38452397562840592166592385927345</i>
+    <!-- need to add functionality to add "unlimited" rooms -->
+
+    <h2>Entities</h2>
+    Number of entities: <input type="number" class="number-selector" value="1">
+    <br>
+
+    <input type="text" placeholder="name" id="entity_name">
+    <i class="example">ex. Green Slime</i>
+    <!-- <span class="preview"> You see a green slime!</span> -->
+    <br>
+    <input type="text" placeholder="hp" id="entity_hp" class="tab1">
+    <i class="example">ex. 10</i>
+    <br>
+    <input type="text" placeholder="damage" id="entity_damage" class="tab1">
+    <i class="example">ex. 3</i>
+    <br>
+    <input type="text" placeholder="description" id="entity_main_description" class="tab1">
+    <i class="example">ex. A green slime with a single eye</i>
+    <br>
+    <input type="text" placeholder="attack description" id="entity_attack_description" class="tab1">
+    <i class="example">ex. The slime attacks you with its tentacles</i>
+    <br>
+    <input type="text" placeholder="passive perception" id="entity_passive_perception" class="tab1">
+    <i class="example">ex. 10</i>
+    <!-- need to add functionality to add "unlimited" entities -->
+
+    <h2>Points of Interest</h2>
+    Number of POIs: <input type="number" class="number-selector" value="1">
+    <br>
+
+    <input type="text" placeholder="name" id="poi_name">
+    <i class="example">ex. Waterfall</i>
+    <br>
+
+    <input type="text" placeholder="description" id="poi_main_description" class="tab1">
+    <i class="example">ex. A large waterfall with a pool at the bottom</i>
+    <br>
+
+    <label for="type_of_poi" class="tab1">What type of POI is this?</label>
+    <select name="type_of_poi" id="poi_type">
+        <option value="container">Container</option>
+        <option value="item">Item</option>
+    </select>
+
+    <div id="poi_data">
+        
+    </div>
+
+    <!-- need to add functionality to add "unlimited" pois -->
+
+</body>
+</html>
