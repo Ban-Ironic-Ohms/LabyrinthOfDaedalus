@@ -140,3 +140,16 @@ function CreateInputField(input_field_name_str, type, parent) {
 }
 
 ShowPoi(room);
+
+
+
+
+
+
+
+
+
+// IGNORE THIS - these are not the droids you are looking for
+$(".chosen-select").chosen({
+    no_results_text: "Oops, nothing found!"
+  })

@@ -5,6 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+
+
+    
     <script defer src="main.js"></script>
     <title>Labyrinth Of Daedalus</title>
 </head>
@@ -65,8 +68,13 @@
     <i class="example">ex. A large waterfall with a pool at the bottom</i>
     <br>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
+    <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
+
     <label for="type_of_poi" class="tab1">What type of POI is this?</label>
-    <select name="type_of_poi" id="poi_type">
+    <!-- <select name="type_of_poi" id="poi_type" multiple class="chosen-select"> -->
+    <select name="type_of_poi" id="poi_type" data-placeholder="Begin typing a name to filter..." multiple class="chosen-select" >
         <option value="container">Container</option>
         <option value="item">Item</option>
     </select>

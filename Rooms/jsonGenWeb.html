@@ -6,9 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <script defer type="module" src="firebase.js"></script> -->
     <link rel="stylesheet" href="styles.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
+    <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
+
     <script defer src="jsonGen.js"></script>
     <title>Testing</title>
 </head>
 <body>
+    <label for="type_of_poi" class="tab1">What type of POI is this?</label>
+    <select name="type_of_poi" id="poi_type" data-placeholder="Begin typing a name to filter..." multiple class="chosen-select">
+        <option value="container">Container</option>
+        <option value="item">Item</option>
+    </select>
 </body>
 </html>
