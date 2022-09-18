@@ -15,6 +15,32 @@ class Room {
 class Poi {
     constructor(classes) {
         this.data = {
+            // So yeah... this happened.
+            // So heres the deal. JavaScript sucks and you cant pass a refrence trough a function.
+            // Somewhere along the function chain, the refrence gets converted into a variable.
+            // This means that if you try to change the value of the variable, it will not change the value of the refrence. (because the refrence was lost)
+            // Back to how JS sucks - some thigs are passed by refrence, some are passed by value.
+            // The difference is the type of object you pass. A string is passed by value, an object is passed by refrence.
+            // A list is passed by value.
+            // So, if you want to pass a refrence, you have to pass an object.
+            // This is why I have to pass an object with a single value.
+            // THIS IS SO STUPID.
+            // I hate JS.
+            // I hate JS.
+            // ... you get the point.
+
+            // SO! This means we can't just pass this class onto firebase, unless we want to fuck everyrthing up.
+            // So we need another function to take this class and convert it into a JSON object / normal js dictionary without the objects.
+            
+            // Another issue may arise if we need to go back and edit the data (i.e. edit a room).
+            // But BouncyPantaloons has gladly offered to do that in it's entierty
+            // So we can just have him do that.
+            // I'm not going to do it.
+            // I'm not going to do it. yay!
+            // ... you get the point.
+            
+            // Hours lost to this issue: 4 - incriment as necessary
+
             // General Data
             name: {value: null},
             id: {value: null},
