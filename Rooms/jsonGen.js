@@ -80,15 +80,16 @@ function CreateSection(poi, section_name, parent, items) {
 
     for (let i = 0; i < items.length; i++) {
         field = CreateInputField(items[i][1], items[i][0], section_base);
-
-        this.Yes = function (event, msg) {
-            console.log(event)
-            console.log(msg)
+        
+        function save(loc, event) {
+            console.log(event);
+            // loc = this.data;
+            loc = event.srcElement.value;
+            console.log(loc);
         }
-        
-        //field.addEventListener("input", this.Yes.bind(this));
-        
-        field.addEventListener("input", this.Yes);
+
+        // console.log(field)
+        field.addEventListener("input", save.bind(this, items[i][2]))
 
     }
     parent.appendChild(section_base);
