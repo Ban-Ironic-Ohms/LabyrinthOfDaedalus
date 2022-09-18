@@ -1,16 +1,20 @@
+// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+// import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
 
-//document.querySelector("#input_jkl").addEventListener("input", Set, true)
+// const firebaseConfig = {
+//     databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
+// };
 
-// function Set(value) {
-//     console.log(value)
-//     //document.querySelector("#Show").innerHTML = document.querySelector('#Input').value;
-// }
+// const app = initializeApp(firebaseConfig);
+// const database = getDatabase(app);
+// const db = getDatabase();
+
+
+// This all is not working ^^
+// My understanding is that it needs to be called as a module in the html (type="module") but I can't get it to work
+// But then it gives errors when I make a variable without declaring it's type (var, let, const)
 
 light_gray = true;
-
-class Room {
-
-}
 
 class Poi {
     constructor(classes) {
