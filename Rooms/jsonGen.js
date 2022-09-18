@@ -16,24 +16,24 @@ class Poi {
     constructor(classes) {
         this.data = {
             // General Data
-            name: null,
-            id: null,
-            url: null,
-            class: classes,
+            name: {value: null},
+            id: {value: null},
+            url: {value: null},
+            class: {value: classes},
             descriptions: {
-                main_description: "Pottaonull",
+                main_description: {value: null},
             },
-            rarity: null,
-            value: null,
-            poi: [],
+            rarity: {value: null},
+            value: {value: null},
+            poi: {},
 
             // Consumable
-            effect: null,
+            effect: {value: null},
 
             // Entity Data
-            hp: null,
-            dmg: null,
-            passive_perception: null,
+            hp: {value: null},
+            dmg: {value: null},
+            passive_perception: {value: null},
         }
     }
 }
@@ -47,10 +47,10 @@ function ShowPoi(poi) {
     base.style.width = String(25) + "%";
     base.style.backgroundColor = "gray";
 
-    CreateSection(poi, "Room", base, [["text", "Main Description", poi.data.descriptions.main_description]]);
-    //if (poi.classes.includes("room")) {
-        
-    
+    if (poi.data.class.value.includes("room")) {
+        CreateSection(poi, "Room", base, [["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description]]);
+    }
+
     // if (poi.classes.includes("enemy")) {
     //     CreateSection(poi, "Door", base, [["text", "Description", poi.name], ["input", "Child Pois?", poi.name]]);
     // }
@@ -81,16 +81,11 @@ function CreateSection(poi, section_name, parent, items) {
     for (let i = 0; i < items.length; i++) {
         field = CreateInputField(items[i][1], items[i][0], section_base);
         
-        function save(loc, event) {
-            console.log(event);
-            // loc = this.data;
-            loc = event.srcElement.value;
-            console.log(loc);
+        function save(variable, event) {
+            variable.value = event.srcElement.value;
+            console.log(poi);
         }
-
-        // console.log(field)
         field.addEventListener("input", save.bind(this, items[i][2]))
-
     }
     parent.appendChild(section_base);
 }
