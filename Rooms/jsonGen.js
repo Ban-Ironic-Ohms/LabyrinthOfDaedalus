@@ -50,10 +50,12 @@ class Poi {
             class: {value: classes},
             descriptions: {
                 main_description: {value: null},
+                door_description: {value: null},
+                attack_description: {value: null},
             },
             rarity: {value: null},
             value: {value: null},
-            poi: {},
+            poi: {value: []},
 
             // Consumable
             effect: {value: null},
@@ -210,8 +212,55 @@ function print() {
 ShowPoi(room);
 
 
+class PoiDict {
+    constructor() {
+        this.data = {
+            name: null,
+            id: null,
+            url: null,
+            class: [],
+            descriptions: {
+                main_description: null,
+                door_description: null,
+                attack_description: null,
+            },
+            rarity: null,
+            value: null,
+            poi: [],
+            effect: null,
+            hp: null,
+            dmg: null,
+            passive_perception: null
+        }
+
+    }
+}
+
+document.getElementById("set_room").addEventListener("click", function () {SaveRoom(room)})
 
 
+function SaveRoom(poi) {
+    console.log("poi");
+    ret = new PoiDict();
+
+    ret.data.name = poi.data.name.value;
+    ret.data.id = poi.data.id.value;
+    ret.data.url = poi.data.url.value;
+    ret.data.class = poi.data.class.value;
+    ret.data.descriptions.main_description = poi.data.descriptions.main_description.value;
+    ret.data.descriptions.door_description = poi.data.descriptions.door_description.value;
+    ret.data.descriptions.attack_description = poi.data.descriptions.attack_description.value;
+    ret.data.rarity = poi.data.rarity.value;
+    ret.data.value = poi.data.value.value;
+    ret.data.poi = poi.data.poi.value;
+    ret.data.effect = poi.data.effect.value;
+    ret.data.hp = poi.data.hp.value;
+    ret.data.dmg = poi.data.dmg.value;
+    ret.data.passive_perception = poi.data.passive_perception.value;
+
+    const room_ref = ref(database, '/rooms' + ret.data.id);
+    set(room_ref, ret.data);
+}
 
 
 
