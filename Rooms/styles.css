@@ -11,3 +11,37 @@
     margin-left: 20%;
     color: rgb(80, 80, 80);
 }
+
+#main{
+    padding-top: 10px;
+    outline: 5px solid black;
+    border-radius: 3px;
+}
+
+#section{
+    margin-top: 15px;
+    padding-top: px;
+    border-radius: 3px;
+}
+
+#input_field_holder{
+    padding: 3px;
+}
+
+h1{
+    text-align: center;
+}
+
+text{
+    color: white;
+    width: 100%;
+    align-items: center;
+}
+
+input{
+    align-items: center;
+    color: black;
+    background-color: rgb(224, 224, 224);
+    border: 2px solid black;
+    width: 50%;
+}
