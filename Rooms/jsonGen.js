@@ -107,17 +107,24 @@ function CreateSection(poi, section_name, parent, items) {
 
 
     for (let i = 0; i < items.length; i++) {
-        function save(variable, event) {
+        function saveInput(variable, event) {
             variable.value = event.srcElement.value;
             console.log(poi);
         }
+
+        function saveSelection(variable, event) {
+            variable.value = GetSelectValues(event.srcElement);
+            console.log(poi);
+        }
+
         
         if (items[i][0] == "selection") {
             field = CreateSelectionField(items[i][1], items[i][3], section_base);
+            field.addEventListener("change", saveSelection.bind(this, items[i][2]));
         } 
         else {
             field = CreateInputField(items[i][1], items[i][0], section_base);
-            field.addEventListener("input", save.bind(this, items[i][2]))
+            field.addEventListener("input", saveInput.bind(this, items[i][2]))
         }
     }
     parent.appendChild(section_base);
@@ -161,7 +168,7 @@ function CreateSelectionField(select_field_name_str, options, parent) {
     input_field = document.createElement('select');
     input_field.style.marginLeft = "50px"
     input_field.multiple = true;
-    input_field.className += "chosen-select";
+    // input_field.className += "chosen-select";
     input_field.id = "poi_type";
     input_field.name = "type_of_poi";
     input_field.width = "100px";
@@ -177,7 +184,8 @@ function CreateSelectionField(select_field_name_str, options, parent) {
     input_field_holder.appendChild(input_field_name);
     input_field_holder.appendChild(input_field);
     parent.appendChild(input_field_holder);
-    return input_field;
+    // input_field_holder.addEventListener("change", print, false);
+    return input_field_holder;
 }
 
 function GetSelectValues(select) {
@@ -196,6 +204,9 @@ function GetSelectValues(select) {
     return result;
 }
 
+function print() {
+    console.log("PRINTING" + this);
+}
 ShowPoi(room);
 
 
@@ -207,6 +218,8 @@ ShowPoi(room);
 
 
 // IGNORE THIS - these are not the droids you are looking for
-$(".chosen-select").chosen({
-    no_results_text: "Oops, nothing found!"
-  })
+// $(".chosen-select").chosen({
+//     no_results_text: "Oops, nothing found!"
+//   })
+
+//   $('.chosen-select').on("change", function(e) {console.log(e)});
