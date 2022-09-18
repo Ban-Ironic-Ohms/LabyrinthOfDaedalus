@@ -41,6 +41,8 @@ class Poi {
             
             // Hours lost to this issue: 4 - incriment as necessary
 
+            //For the record I did no't agree to do all the js -B.P.
+
             // General Data
             name: {value: null},
             id: {value: null},
