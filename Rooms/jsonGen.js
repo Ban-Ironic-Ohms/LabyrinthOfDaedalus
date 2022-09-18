@@ -159,23 +159,41 @@ function CreateSelectionField(select_field_name_str, options, parent) {
     input_field_name.innerHTML = select_field_name_str;
 
     input_field = document.createElement('select');
-    input_field.style.marginLeft = "25px"
+    input_field.style.marginLeft = "50px"
     input_field.multiple = true;
     input_field.className += "chosen-select";
     input_field.id = "poi_type";
+    input_field.name = "type_of_poi";
     input_field.width = "100px";
     input_field.placeholder = select_field_name_str;
 
     for (let i = 0; i < options.length; i++) {
         new_option = document.createElement("option");
         new_option.value = options[i];
+        new_option.innerHTML = options[i];
         input_field.appendChild(new_option)
     }
 
     input_field_holder.appendChild(input_field_name);
     input_field_holder.appendChild(input_field);
     parent.appendChild(input_field_holder);
-    return input_field_holder;
+    return input_field;
+}
+
+function GetSelectValues(select) {
+    var result = [];
+    var options = select && select.options;
+    var opt;
+
+    for (var i=0, iLen=options.length; i<iLen; i++) {
+        opt = options[i];
+
+        if (opt.selected) {
+        result.push(opt.value || opt.text);
+        }
+    }
+    console.log(result);
+    return result;
 }
 
 ShowPoi(room);
