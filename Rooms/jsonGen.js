@@ -1,25 +1,42 @@
 
 //document.querySelector("#input_jkl").addEventListener("input", Set, true)
 
-function Set(value) {
-    console.log(value)
-    //document.querySelector("#Show").innerHTML = document.querySelector('#Input').value;
-}
+// function Set(value) {
+//     console.log(value)
+//     //document.querySelector("#Show").innerHTML = document.querySelector('#Input').value;
+// }
 
 light_gray = true;
 
+class Room {
+
+}
+
 class Poi {
-    constructor() {
-        this.name;
-        this.bool;
-        this.number;
-        this.description;
-        this.child_pois = [];
-        this.classes = [];
+    constructor(classes) {
+        this.data = {
+            // General Data
+            name: null,
+            id: null,
+            url: null,
+            class: [],
+            descriptions: [],
+            rarity: null,
+            value: null,
+            poi: [],
+
+            // Consumable
+            effect: null,
+
+            // Entity Data
+            hp: null,
+            dmg: null,
+            passive_perception: null,
+        }
     }
 }
 
-room = new Poi();
+room = new Poi(["room", "enemy", "container"]);
 
 function ShowPoi(poi) {
     base = document.createElement('div');
@@ -28,8 +45,17 @@ function ShowPoi(poi) {
     base.style.width = String(25) + "%";
     base.style.backgroundColor = "gray";
 
-    CreateSection(poi, "Room", base, [["text", "Name", poi.name], ["text", "Description", poi.description], ["checkbox", "Bool", poi.bool], ["number", "Number", poi.number]]);
-    CreateSection(poi, "Door", base, [["text", "Description", poi.name], ["input", "Child Pois?", poi.name]]);
+    CreateSection(poi, "Room", base, [["text", "Room Name", "name"], ["text", "Main Description", "descriptions"]]);
+    //if (poi.classes.includes("room")) {
+        
+    
+    // if (poi.classes.includes("enemy")) {
+    //     CreateSection(poi, "Door", base, [["text", "Description", poi.name], ["input", "Child Pois?", poi.name]]);
+    // }
+
+    // if (poi.classes.includes("container")) {
+    //     CreateSection(poi, "Pois", base, [["text", "Description", poi.name], ["input", "Child Pois?", poi.name]]);
+    // }
 
     document.body.appendChild(base);
     document.body.appendChild(base);
@@ -51,7 +77,7 @@ function CreateSection(poi, section_name, parent, items) {
 
 
     for (let i = 0; i < items.length; i++) {
-        items[i][2] = CreateInputField(items[i][1], items[i][0], section_base);
+        poi.data[items[i][2]] = CreateInputField(items[i][1], items[i][0], section_base);
     }
     parent.appendChild(section_base);
 }
