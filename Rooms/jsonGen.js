@@ -74,15 +74,47 @@ class Poi {
 
 room = new Poi(["room", "enemy", "container"]);
 
+inputTypes = {
+  text: "text",
+  number: "number",
+  placeholder: "placeholder",
+  none: "none"
+}
+
+classes = {
+  base_class: {
+      name: inputTypes.text,
+      class: inputTypes.placeholder,
+      descriptions: {
+          main_description: inputTypes.text
+      }
+  },
+  room: {
+      poi: inputTypes.placeholder,
+      id: inputTypes.number,
+      descriptions: {
+        door_description: inputTypes.text
+      },
+      url: inputTypes.none,
+      rarity: inputTypes.none
+  },
+  container: {
+      size: inputTypes.number,
+      poi: inputTypes.placeholder
+  },
+  enemy: {
+    descriptions: {
+      attack_description: inputTypes.text
+    }
+  }
+}
+
 function ShowPoi(poi) {
-    base = document.createElement('div');
-    base.id = "main";
-    base.style.height = "97vh";
-    base.style.width = String(25) + "%";
-    base.style.backgroundColor = "gray";
+    let main = document.createElement('div');
+    main.id = "main";
 
     if (poi.data.class.value.includes("room")) {
-        CreateSection(poi, "Room", base, [["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description], ["selection", "Class(s)", poi.data.class, ["room", "container", "enemy", "item", "consumable"]]]);
+        CreateSection(poi, "Room", main, [["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description], ["selection", "Class(s)", poi.data.class, ["room", "container", "enemy", "item", "consumable"]]]);
     }
 
     // if (poi.classes.includes("enemy")) {
@@ -93,12 +125,11 @@ function ShowPoi(poi) {
     //     CreateSection(poi, "Pois", base, [["text", "Description", poi.name], ["input", "Child Pois?", poi.name]]);
     // }
 
-    document.body.appendChild(base);
-    document.body.appendChild(base);
+    document.body.appendChild(main);
 }
 
 function CreateSection(poi, section_name, parent, items) {
-    section_base = document.createElement('div');
+    let section_base = document.createElement('div');
 
     section_base.id = "section";
     section_base.style.width = "90%"
@@ -107,7 +138,7 @@ function CreateSection(poi, section_name, parent, items) {
     section_base.height = "10px";
 
     header = document.createElement("h1");
-    header.innerHTML=section_name;
+    header.innerHTML = section_name;
     header.style.height = "17px";
     section_base.appendChild(header);
 
@@ -213,7 +244,6 @@ function GetSelectValues(select) {
 function print() {
     console.log("PRINTING" + this);
 }
-ShowPoi(room);
 
 
 class PoiDict {
@@ -239,8 +269,11 @@ class PoiDict {
 
     }
 }
+for(let i = 0; i < 5; i++) {
+  ShowPoi(room);
+}
 
-document.getElementById("set_room").addEventListener("click", function () {SaveRoom(room)})
+// document.getElementById("set_room").addEventListener("click", function () {SaveRoom(room)})
 
 
 function SaveRoom(poi) {

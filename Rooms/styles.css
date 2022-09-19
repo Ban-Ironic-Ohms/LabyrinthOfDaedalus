@@ -1,3 +1,23 @@
+:root {
+    --padding: 10px;
+    --border-width: 15px;
+}
+
+html {
+    margin: 0;
+    height: 100%;
+}
+
+body, html {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    /* width: fit-content;
+    white-space: nowrap; */
+}
+
 .tab1 {
     margin-left: 40px;
 }
@@ -12,10 +32,19 @@
     color: rgb(80, 80, 80);
 }
 
-#main{
-    padding-top: 10px;
-    outline: 5px solid black;
+#main {
+    /* margin-top: var(--padding); */
+    margin-left: var(--padding);
+    padding-top: var(--padding);
+    border-width: var(--border-width);
+    border-style: solid;
+    border-color: black;
     border-radius: 3px;
+    
+    height: calc(100% - 2 * var(--border-width));
+    width: calc(25vw - var(--padding) * (1 + 1/4) - 2 * var(--border-width));
+    background-color: rgb(245, 169, 184);
+    float: left;
 }
 
 #section{
