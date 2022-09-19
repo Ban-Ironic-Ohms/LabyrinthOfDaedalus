@@ -1,20 +1,20 @@
-// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
-// import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
 
-// const firebaseConfig = {
-//     databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
-// };
+const firebaseConfig = {
+    databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
+};
 
-// const app = initializeApp(firebaseConfig);
-// const database = getDatabase(app);
-// const db = getDatabase();
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const db = getDatabase();
 
 
 // This all is not working ^^
 // My understanding is that it needs to be called as a module in the html (type="module") but I can't get it to work
 // But then it gives errors when I make a variable without declaring it's type (var, let, const)
 
-light_gray = true;
+var light_gray = true;
 
 class Poi {
     constructor(classes) {
@@ -72,17 +72,17 @@ class Poi {
     }
 }
 
-room = new Poi(["room", "enemy", "container"]);
+var room = new Poi(["room", "enemy", "container"]);
 
 function ShowPoi(poi) {
-    base = document.createElement('div');
+    var base = document.createElement('div');
     base.id = "main";
     base.style.height = "97vh";
     base.style.width = String(25) + "%";
     base.style.backgroundColor = "gray";
 
     if (poi.data.class.value.includes("room")) {
-        CreateSection(poi, "Room", base, [["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description], ["selection", "Class(s)", poi.data.class, ["room", "container", "enemy", "item", "consumable"]]]);
+        CreateSection(poi, "Room", base, [["text", "rm_ID", poi.data.id], ["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description], ["selection", "Class(s)", poi.data.class, ["room", "container", "enemy", "item", "consumable"]]]);
     }
 
     // if (poi.classes.includes("enemy")) {
@@ -98,7 +98,7 @@ function ShowPoi(poi) {
 }
 
 function CreateSection(poi, section_name, parent, items) {
-    section_base = document.createElement('div');
+    var section_base = document.createElement('div');
 
     section_base.id = "section";
     section_base.style.width = "90%"
@@ -106,7 +106,7 @@ function CreateSection(poi, section_name, parent, items) {
     section_base.style.outline = '3px dashed black';
     section_base.height = "10px";
 
-    header = document.createElement("h1");
+    var header = document.createElement("h1");
     header.innerHTML=section_name;
     header.style.height = "17px";
     section_base.appendChild(header);
@@ -120,16 +120,16 @@ function CreateSection(poi, section_name, parent, items) {
 
         function saveSelection(variable, event) {
             variable.value = GetSelectValues(event.srcElement);
-            console.log(poi);
+            // console.log(poi);
         }
 
         
         if (items[i][0] == "selection") {
-            field = CreateSelectionField(items[i][1], items[i][3], section_base);
+            var field = CreateSelectionField(items[i][1], items[i][3], section_base);
             field.addEventListener("change", saveSelection.bind(this, items[i][2]));
         } 
         else {
-            field = CreateInputField(items[i][1], items[i][0], section_base);
+            var field = CreateInputField(items[i][1], items[i][0], section_base);
             field.addEventListener("input", saveInput.bind(this, items[i][2]))
         }
     }
@@ -137,18 +137,18 @@ function CreateSection(poi, section_name, parent, items) {
 }
 
 function CreateInputField(input_field_name_str, type, parent) {
-    input_field_holder = document.createElement('div');
+    var input_field_holder = document.createElement('div');
     if (light_gray)
         input_field_holder.style.backgroundColor = "darkgray" 
         light_gray = !light_gray;
 
     input_field_holder.id = "input_field_holder"
 
-    input_field_name = document.createElement('text');
+    var input_field_name = document.createElement('text');
     input_field_name.style.marginLeft = "25px"
     input_field_name.innerHTML = input_field_name_str;
 
-    input_field = document.createElement('input');
+    var input_field = document.createElement('input');
     input_field.style.marginLeft = "25px"
     input_field.placeholder = input_field_name_str;
     input_field.type = type
@@ -160,18 +160,18 @@ function CreateInputField(input_field_name_str, type, parent) {
 }
 
 function CreateSelectionField(select_field_name_str, options, parent) {
-    input_field_holder = document.createElement('div');
+    var input_field_holder = document.createElement('div');
     if (light_gray)
         input_field_holder.style.backgroundColor = "darkgray" 
         light_gray = !light_gray;
 
     input_field_holder.id = "input_field_holder"
 
-    input_field_name = document.createElement('text');
+    var input_field_name = document.createElement('text');
     input_field_name.style.marginLeft = "25px"
     input_field_name.innerHTML = select_field_name_str;
 
-    input_field = document.createElement('select');
+    var input_field = document.createElement('select');
     input_field.style.marginLeft = "50px"
     input_field.multiple = true;
     // input_field.className += "chosen-select";
@@ -181,7 +181,7 @@ function CreateSelectionField(select_field_name_str, options, parent) {
     input_field.placeholder = select_field_name_str;
 
     for (let i = 0; i < options.length; i++) {
-        new_option = document.createElement("option");
+        var new_option = document.createElement("option");
         new_option.value = options[i];
         new_option.innerHTML = options[i];
         input_field.appendChild(new_option)
@@ -245,7 +245,7 @@ document.getElementById("set_room").addEventListener("click", function () {SaveR
 
 function SaveRoom(poi) {
     console.log("poi");
-    ret = new PoiDict();
+    var ret = new PoiDict();
 
     ret.data.name = poi.data.name.value;
     ret.data.id = poi.data.id.value;
@@ -262,7 +262,8 @@ function SaveRoom(poi) {
     ret.data.dmg = poi.data.dmg.value;
     ret.data.passive_perception = poi.data.passive_perception.value;
 
-    const room_ref = ref(database, '/rooms' + ret.data.id);
+    const room_ref = ref(database, '/rooms/' + ret.data.id);
+    console.log(ret.data);
     set(room_ref, ret.data);
 }
 
