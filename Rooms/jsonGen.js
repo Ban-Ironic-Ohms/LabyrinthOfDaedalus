@@ -9,11 +9,6 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const db = getDatabase();
 
-
-// This all is not working ^^
-// My understanding is that it needs to be called as a module in the html (type="module") but I can't get it to work
-// But then it gives errors when I make a variable without declaring it's type (var, let, const)
-
 var light_gray = true;
 
 class Poi {
@@ -82,7 +77,7 @@ function ShowPoi(poi) {
     base.style.backgroundColor = "gray";
 
     if (poi.data.class.value.includes("room")) {
-        CreateSection(poi, "Room", base, [["text", "rm_ID", poi.data.id], ["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description], ["selection", "Class(s)", poi.data.class, ["room", "container", "enemy", "item", "consumable"]]]);
+        CreateSection(poi, "Room", base, [["text", "rm_ID", poi.data.id], ["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description], ["selection-multiple", "Class(s)", poi.data.class, ["room", "container", "enemy", "item", "consumable"]]]);
     }
 
     // if (poi.classes.includes("enemy")) {
@@ -123,12 +118,17 @@ function CreateSection(poi, section_name, parent, items) {
             // console.log(poi);
         }
 
+        const input_types = ["button", "checkbox", "color", "date", "datetime-local", "email", "file", "hidden", "image", "month", "number", "password", "radio", "range", "reset", "search", "submit", "tel", "text", "time", "url", "week"]
         
-        if (items[i][0] == "selection") {
+        if (items[i][0] == "selection-single") {
             var field = CreateSelectionField(items[i][1], items[i][3], section_base);
             field.addEventListener("change", saveSelection.bind(this, items[i][2]));
         } 
-        else {
+        else if (items[i][0] == "selection-multiple") {
+            var field = CreateSelectionFieldMultiple(items[i][1], items[i][3], section_base);
+            field.addEventListener("change", saveSelection.bind(this, items[i][2]));
+        }
+        else if (input_types.includes(items[i][0])) {
             var field = CreateInputField(items[i][1], items[i][0], section_base);
             field.addEventListener("input", saveInput.bind(this, items[i][2]))
         }
@@ -191,6 +191,24 @@ function CreateSelectionField(select_field_name_str, options, parent) {
     input_field_holder.appendChild(input_field);
     parent.appendChild(input_field_holder);
     // input_field_holder.addEventListener("change", print, false);
+    return input_field_holder;
+}
+
+function CreateSelectionFieldMultiple(select_field_name_str, options, parent) {
+    var input_field_holder = document.createElement('div');
+    if (light_gray)
+        input_field_holder.style.backgroundColor = "darkgray" 
+        light_gray = !light_gray;
+    input_field_holder.id = "input_field_holder"
+
+    input_field_holder.style.height = "133px";
+
+    for (let i = 0; i < options.length; i++) {
+        console.log("Hi");
+        CreateInputField(select_field_name_str + " " + i, "checkbox", input_field_holder);
+    }
+
+    parent.appendChild(input_field_holder);
     return input_field_holder;
 }
 
