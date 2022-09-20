@@ -71,6 +71,7 @@ const db = getDatabase();
 // }
 
 function capitalize(str) {
+  // Takes in a string of words separated by spaces or underscores, returns a string of words separated by spaces with each first letter capitalized
   let words = str.includes("_") ? str.split("_") : str.split(" ");
   for(let i = 0; i < words.length; i++) {
     words[i] = words[i][0].toUpperCase() + words[i].substring(1);
@@ -78,42 +79,56 @@ function capitalize(str) {
   return words.join(" ")
 }
 
-let examplePoi = {
-  name: "Room",
-  class: ["room", "container"],
-  poi: []
+function addClassToPoi(poi, className) {
+  if("class" in poi) {
+    poi["class"].push(className);
+  }
+  for(let key in classes[className]) {
+    poi[key] = classes[className][key].default;
+  }
+}
+
+function getBaseRoom() {
+  let poi = {}
+  addClassToPoi(poi, "poi");
+  addClassToPoi(poi, "room");
+  addClassToPoi(poi, "container");
+  poi.name = "Room"
+
+  return poi;
 }
 
 let inputTypes = {
-  text: {inputType: "input", options: "text"},
-  number: {inputType: "input", options: "number"},
-  select: (multiple, items) => { return {inputType: "select", options: {multiple: multiple, list: items}} },
-  none: {inputType: "none"}
+  // TODO: Have to figure out when & when not to autofill the default / previously-entered values
+  text: (def="") => ({default: def, inputType: "input", options: "text"}),
+  number: (def) => ({default: def, inputType: "input", options: "number"}),
+  select: (def, multiple, items) => ({default: def, inputType: "select", options: {multiple: multiple, list: items}}),
+  none: (def=undefined) => ({default: def, inputType: "none"})
 }
 
 let classes = {
   poi: {
-      name: inputTypes.text,
-      class: inputTypes.select(true, ["room", "container", "enemy"]),
+      name: inputTypes.text("Poi"),
+      class: inputTypes.select([], true, ["room", "container", "enemy"]),
       descriptions: {
-          main_description: inputTypes.text
+          main_description: inputTypes.text()
       }
   },
   room: {
-      id: inputTypes.number,
+      id: inputTypes.number("temporary!"),
       descriptions: {
-        door_description: inputTypes.text
+        door_description: inputTypes.text()
       },
-      url: inputTypes.none,
-      rarity: inputTypes.none
+      url: inputTypes.none(),
+      rarity: inputTypes.none()
   },
   container: {
-      poi: inputTypes.select(false, ["Child poi 1", "Child poi 2"]),
-      size: inputTypes.number
+      poi: inputTypes.select([], false, ["Child poi 1", "Child poi 2"]),
+      size: inputTypes.number(0)
   },
   enemy: {
     descriptions: {
-      attack_description: inputTypes.text
+      attack_description: inputTypes.text()
     }
   }
 }
@@ -188,7 +203,7 @@ function createInputField(input_field_name_str, type, parent, fieldNum) {
     input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
     input_field_holder.classList.add("input_field_holder");
 
-    let input_field_name = document.createElement('text');
+    let input_field_name = document.createElement('span');
     input_field_name.classList.add("input_field_name")
     input_field_name.innerHTML = input_field_name_str;
 
@@ -207,7 +222,7 @@ function createSelectionField(select_field_name_str, list, parent, fieldNum) {
     input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
     input_field_holder.classList.add("input_field_holder")
 
-    let input_field_name = document.createElement('text');
+    let input_field_name = document.createElement('span');
     input_field_name.classList.add("input_field_name")
     input_field_name.innerHTML = select_field_name_str;
 
@@ -243,7 +258,7 @@ function CreateSelectionFieldMultiple(select_field_name_str, list, parent, field
     name_field_holder.classList.add("name_field_holder")
     selection_field_holder.appendChild(name_field_holder)
 
-    var input_field_name = document.createElement('text');
+    var input_field_name = document.createElement('span');
     input_field_name.classList.add("input_field_name")
     input_field_name.innerHTML = select_field_name_str;
     name_field_holder.appendChild(input_field_name);
@@ -251,7 +266,6 @@ function CreateSelectionFieldMultiple(select_field_name_str, list, parent, field
     var fields = [];
 
     for (let i = 0; i < list.length; i++) {
-        console.log("Hi");
         [fields[i], fieldNum] = (createInputField(select_field_name_str + " " + i, "checkbox", selection_field_holder, fieldNum));
     }
 
@@ -288,13 +302,12 @@ function print() {
     console.log("PRINTING" + this);
 }
 
-showPoi(examplePoi);
-
-document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
-
-
 function saveRoom(poi) {
   // No longer need to create new PoiDict, since poi is already in the correct format.
+
+  // When saving room, trim any variables in poi that don't correspond to any classes on poi
+  // Also, we should probably calculate stuff like rarity and id here, right?
+
   console.log(poi);
 
   const room_ref = ref(database, '/rooms' + poi.id);
@@ -302,7 +315,11 @@ function saveRoom(poi) {
 }
 
 
+let room = getBaseRoom();
 
+showPoi(room);
+
+document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
 
 
 // IGNORE THIS - these are not the droids you are looking for

@@ -1,4 +1,7 @@
 .idea
-Rooms/__pycache__
+rooms/__pycache__
+firebase/__pycache__
+player/__pycache__
+__pycache__
 firebase-keys.json
 /node_modules

@@ -1,6 +1,8 @@
 :root {
     --padding: 10px;
     --border-width: 5px;
+    --inner-border-width: 3px;
+    --columns-per-page: 4;
 }
 
 html {
@@ -12,6 +14,7 @@ body, html {
     margin: 0;
     height: 100%;
     width: 100%;
+    user-select: none;
 }
 
 #main {
@@ -48,7 +51,7 @@ body, html {
     border-radius: 3px;
     
     height: calc(100% - 2 * var(--padding) - 2 * var(--border-width));
-    width: calc(25vw - var(--padding) * (1 + 1/4) - 2 * var(--border-width));
+    width: calc(100% / var(--columns-per-page) - var(--padding) * (1 + 1/var(--columns-per-page)) - 2 * var(--border-width));
     background-color: darkgray;
 
     white-space: normal;
@@ -56,14 +59,17 @@ body, html {
     overflow-y: auto;
 }
 
+.poi:last-child {
+    margin-right: var(--padding);
+}
+
 .section {
-    --border-width: 3px;
     margin-top: var(--padding);
-    width: calc(100% - 2 * var(--padding) - 2 * var(--border-width));
+    width: calc(100% - 2 * var(--padding) - 2 * var(--inner-border-width));
     margin-left: var(--padding);
     border-radius: 3px;
     
-    border-width: var(--border-width);
+    border-width: var(--inner-border-width);
     border-style: dashed; 
     border-color: black;
     height: "10px";
@@ -84,13 +90,8 @@ h1{
     text-align: center;
 }
 
-text{
-    color: white;
-    width: 100%;
-    align-items: center;
-}
-
 .input_field_holder, .name_field_holder {
+    color: white;
     height: fit-content;
     padding: 3px;
 }
@@ -122,5 +123,6 @@ text{
 }
 
 .selection_field_holder .input_field_holder .input_field_name {
+    /* Indents the elements of a list field */
     margin-left: 20px;
 }
