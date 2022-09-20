@@ -290,14 +290,14 @@ function print() {
 
 showPoi(examplePoi);
 
-document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
+document.getElementById("set_room").addEventListener("click", function () {saveRoom(examplePoi)})
 
 
 function saveRoom(poi) {
   // No longer need to create new PoiDict, since poi is already in the correct format.
   console.log(poi);
 
-  const room_ref = ref(database, '/rooms' + poi.id);
+  const room_ref = ref(database, '/rooms/' + poi.id);
   set(room_ref, poi);
 }
 
