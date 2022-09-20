@@ -23,11 +23,11 @@ onValue(rooms_ref, (snapshot) => {
 
 function update_room(data) {
   console.log(data);
-  document.getElementById("rooms_lll").innerHTML += JSON.stringify(data);
-  document.getElementById("rooms_lll").innerHTML += "<br>";
+  // document.getElementById("rooms_lll").innerHTML += JSON.stringify(data);
+  // document.getElementById("rooms_lll").innerHTML += "<br>";
 }
 
-document.querySelector("#submit_changes").addEventListener("click", Set, true)
+document.querySelector("#set_room").addEventListener("click", Set, true)
 
 
 function Set() {

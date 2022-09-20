@@ -98,11 +98,15 @@ function getBaseRoom() {
   return poi;
 }
 
+function setToValue(dict, key, newValue) {
+  dict[key] = newValue
+}
+
 let inputTypes = {
   // TODO: Have to figure out when & when not to autofill the default / previously-entered values
-  text: (def="") => ({default: def, inputType: "input", options: "text"}),
-  number: (def) => ({default: def, inputType: "input", options: "number"}),
-  select: (def, multiple, items) => ({default: def, inputType: "select", options: {multiple: multiple, list: items}}),
+  text: (def="", onChange=setToValue) => ({default: def, inputType: "input", options: "text", onChange: onChange}),
+  number: (def, onChange=setToValue) => ({default: def, inputType: "input", options: "number", onChange: onChange}),
+  select: (def, multiple, items, onChange=setToValue) => ({default: def, inputType: "select", options: {multiple: multiple, list: items}, onChange: onChange}),
   none: (def=undefined) => ({default: def, inputType: "none"})
 }
 
@@ -146,31 +150,6 @@ function showPoi(poi) {
     document.getElementById("main").appendChild(poiDiv);
 }
 
-function addInput(dict, key, input, parentSection, counter) {
-  let inputType = input.inputType;
-  let options = input.options;
-  let field;
-
-  if (inputType == "input") {
-    [field, counter] = createInputField(capitalize(key), options, parentSection, counter);
-    field.addEventListener("input", (event) => {
-        dict[key] = event.srcElement.value;
-    })
-  } else if(inputType == "select" && !options.multiple) {
-    [field, counter] = createSelectionField(capitalize(key), options.list, parentSection, counter);
-    field.addEventListener("change", (event) => {
-        dict[key] = event.srcElement.value;
-    });
-  } else if(inputType == "select" && options.multiple) {
-    [field, counter] = CreateSelectionFieldMultiple(capitalize(key), options.list, parentSection, counter);
-    field.addEventListener("change", (event) => {
-        dict[key] = GetSelectValues(event.srcElement);
-    });
-  }
-
-  return counter
-}
-
 function createSection(poi, className, parent) {
     let section_base = document.createElement('div');
     section_base.classList.add("section");
@@ -196,6 +175,31 @@ function createSection(poi, className, parent) {
     }
 
     parent.appendChild(section_base);
+}
+
+function addInput(dict, key, input, parentSection, counter) {
+  let inputType = input.inputType;
+  let options = input.options;
+  let field;
+
+  if (inputType == "input") {
+    [field, counter] = createInputField(capitalize(key), options, parentSection, counter);
+    field.addEventListener("input", (event) => {
+      input.onChange(dict, key, event.srcElement.value);
+    })
+  } else if(inputType == "select" && !options.multiple) {
+    [field, counter] = createSelectionField(capitalize(key), options.list, parentSection, counter);
+    field.addEventListener("change", (event) => {
+      input.onChange(dict, key, event.srcElement.value);
+    });
+  } else if(inputType == "select" && options.multiple) {
+    [field, counter] = CreateSelectionFieldMultiple(capitalize(key), options.list, parentSection, counter, (values) => {
+      input.onChange(dict, key, values)
+    });
+    
+  }
+
+  return counter
 }
 
 function createInputField(input_field_name_str, type, parent, fieldNum) {
@@ -249,7 +253,7 @@ function createSelectionField(select_field_name_str, list, parent, fieldNum) {
     return [input_field_holder, fieldNum];
 }
 
-function CreateSelectionFieldMultiple(select_field_name_str, list, parent, fieldNum) {
+function CreateSelectionFieldMultiple(select_field_name_str, list, parent, fieldNum, onChange) {
     var selection_field_holder = document.createElement('div');
     selection_field_holder.classList.add("selection_field_holder")
 
@@ -265,8 +269,18 @@ function CreateSelectionFieldMultiple(select_field_name_str, list, parent, field
 
     var fields = [];
 
+    var selectedItems = []
     for (let i = 0; i < list.length; i++) {
-        [fields[i], fieldNum] = (createInputField(select_field_name_str + " " + i, "checkbox", selection_field_holder, fieldNum));
+        [fields[i], fieldNum] = (createInputField(list[i], "checkbox", selection_field_holder, fieldNum));
+        fields[i].addEventListener("change", (event) => {
+          console.log(event.srcElement.checked)
+          if(event.srcElement.checked) {
+            selectedItems.push(list[i]);
+          } else {
+            selectedItems.splice(selectedItems.indexOf(list[i]), 1);
+          }
+          onChange(selectedItems)
+        })
     }
 
     let total_height = 10;
