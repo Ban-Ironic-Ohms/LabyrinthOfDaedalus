@@ -195,21 +195,30 @@ function CreateSelectionField(select_field_name_str, options, parent) {
 }
 
 function CreateSelectionFieldMultiple(select_field_name_str, options, parent) {
-    var input_field_holder = document.createElement('div');
-    if (light_gray)
-        input_field_holder.style.backgroundColor = "darkgray" 
-        light_gray = !light_gray;
-    input_field_holder.id = "input_field_holder"
+    var selection_field_holder = document.createElement('div');
+    
+    var input_field_name = document.createElement('text');
+    input_field_name.style.marginLeft = "25px"
+    input_field_name.innerHTML = select_field_name_str;
+    selection_field_holder.appendChild(input_field_name);
 
-    input_field_holder.style.height = "133px";
+    var fields = [];
 
     for (let i = 0; i < options.length; i++) {
         console.log("Hi");
-        CreateInputField(select_field_name_str + " " + i, "checkbox", input_field_holder);
+        fields[i] = (CreateInputField(select_field_name_str + " " + i, "checkbox", selection_field_holder));
     }
 
-    parent.appendChild(input_field_holder);
-    return input_field_holder;
+    let total_height = 10;
+
+    for (let i = 0; i < fields.length; i++) {
+        total_height += fields[i].style.height;
+    }
+
+    selection_field_holder.style.height = total_height;
+
+    parent.appendChild(selection_field_holder);
+    return selection_field_holder;
 }
 
 function GetSelectValues(select) {
