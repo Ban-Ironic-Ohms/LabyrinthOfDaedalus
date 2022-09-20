@@ -1,13 +1,13 @@
-// import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
-// import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
 
-// const firebaseConfig = {
-//     databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
-// };
+const firebaseConfig = {
+    databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
+};
 
-// const app = initializeApp(firebaseConfig);
-// const database = getDatabase(app);
-// const db = getDatabase();
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const db = getDatabase();
 
 
 // This all is not working ^^
@@ -81,26 +81,6 @@ function capitalize(str) {
 let examplePoi = {
   name: "Room",
   class: ["room", "container"],
-  poi: [
-    {
-      name: "Chest",
-      class: [],
-      poi: [{name: "Potion", class: []}, {name: "Key", class: []}]
-    },
-    {
-      name: "Waterfall",
-      class: [],
-      poi: [{name: "Slime", class: []}]
-    },
-    {
-      name: "Key",
-      class: []
-    }
-  ]
-}
-examplePoi = {
-  name: "Room",
-  class: ["room", "container"],
   poi: []
 }
 
@@ -154,18 +134,26 @@ function showPoi(poi) {
 function addInput(dict, key, input, parentSection, counter) {
   let inputType = input.inputType;
   let options = input.options;
+  let field;
 
   if (inputType == "input") {
-    field = createInputField(capitalize(key), options, parentSection, counter);
+    [field, counter] = createInputField(capitalize(key), options, parentSection, counter);
     field.addEventListener("input", (event) => {
         dict[key] = event.srcElement.value;
     })
-  } else if(inputType == "select") {
-    field = createSelectionField(capitalize(key), options, parentSection, counter);
+  } else if(inputType == "select" && !options.multiple) {
+    [field, counter] = createSelectionField(capitalize(key), options.list, parentSection, counter);
+    field.addEventListener("change", (event) => {
+        dict[key] = event.srcElement.value;
+    });
+  } else if(inputType == "select" && options.multiple) {
+    [field, counter] = CreateSelectionFieldMultiple(capitalize(key), options.list, parentSection, counter);
     field.addEventListener("change", (event) => {
         dict[key] = GetSelectValues(event.srcElement);
     });
   }
+
+  return counter
 }
 
 function createSection(poi, className, parent) {
@@ -184,12 +172,12 @@ function createSection(poi, className, parent) {
           if(!(key in poi)) {
             poi[key] = {}
           }
-          addInput(poi[key], secondaryKey, dict[secondaryKey], section_base, counter++)
+          counter = addInput(poi[key], secondaryKey, dict[secondaryKey], section_base, counter)
           
         } 
       }
 
-      addInput(poi, key, classes[className][key], section_base, counter++)
+      counter = addInput(poi, key, classes[className][key], section_base, counter)
     }
 
     parent.appendChild(section_base);
@@ -197,7 +185,7 @@ function createSection(poi, className, parent) {
 
 function createInputField(input_field_name_str, type, parent, fieldNum) {
     let input_field_holder = document.createElement('div');
-    input_field_holder.classList.add(fieldNum % 2 ? "odd" : "even")
+    input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
     input_field_holder.classList.add("input_field_holder");
 
     let input_field_name = document.createElement('text');
@@ -211,12 +199,12 @@ function createInputField(input_field_name_str, type, parent, fieldNum) {
     input_field_holder.appendChild(input_field_name);
     input_field_holder.appendChild(input_field);
     parent.appendChild(input_field_holder);
-    return input_field_holder;
+    return [input_field_holder, fieldNum];
 }
 
-function createSelectionField(select_field_name_str, options, parent, fieldNum) {
+function createSelectionField(select_field_name_str, list, parent, fieldNum) {
     let input_field_holder = document.createElement('div');
-    input_field_holder.classList.add(fieldNum % 2 ? "odd" : "even")
+    input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
     input_field_holder.classList.add("input_field_holder")
 
     let input_field_name = document.createElement('text');
@@ -224,16 +212,16 @@ function createSelectionField(select_field_name_str, options, parent, fieldNum) 
     input_field_name.innerHTML = select_field_name_str;
 
     let input_field = document.createElement('select');
-    input_field.multiple = options.multiple;
+    input_field.multiple = false;
     // input_field.className += "chosen-select";
     input_field.id = "poi_type";
     input_field.name = "type_of_poi";
     input_field.width = "100px";
     input_field.placeholder = select_field_name_str;
 
-    let list = options.list.map((word) => capitalize(word))
+    list = list.map((word) => capitalize(word))
     for (let i = 0; i < list.length; i++) {
-        new_option = document.createElement("option");
+        let new_option = document.createElement("option");
         new_option.value = list[i];
         new_option.innerHTML = list[i];
         input_field.appendChild(new_option)
@@ -243,12 +231,46 @@ function createSelectionField(select_field_name_str, options, parent, fieldNum) 
     input_field_holder.appendChild(input_field);
     parent.appendChild(input_field_holder);
     // input_field_holder.addEventListener("change", print, false);
-    return input_field_holder;
+    return [input_field_holder, fieldNum];
+}
+
+function CreateSelectionFieldMultiple(select_field_name_str, list, parent, fieldNum) {
+    var selection_field_holder = document.createElement('div');
+    selection_field_holder.classList.add("selection_field_holder")
+
+    var name_field_holder = document.createElement("div")
+    name_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
+    name_field_holder.classList.add("name_field_holder")
+    selection_field_holder.appendChild(name_field_holder)
+
+    var input_field_name = document.createElement('text');
+    input_field_name.classList.add("input_field_name")
+    input_field_name.innerHTML = select_field_name_str;
+    name_field_holder.appendChild(input_field_name);
+
+    var fields = [];
+
+    for (let i = 0; i < list.length; i++) {
+        console.log("Hi");
+        [fields[i], fieldNum] = (createInputField(select_field_name_str + " " + i, "checkbox", selection_field_holder, fieldNum));
+    }
+
+    let total_height = 10;
+
+    for (let i = 0; i < fields.length; i++) {
+        total_height += fields[i].style.height;
+    }
+
+    selection_field_holder.style.height = total_height;
+
+    parent.appendChild(selection_field_holder);
+    return [selection_field_holder, fieldNum];
 }
 
 function GetSelectValues(select) {
     var result = [];
     var options = select && select.options;
+    console.log(options)
     var opt;
 
     for (var i=0, iLen=options.length; i<iLen; i++) {
@@ -266,11 +288,9 @@ function print() {
     console.log("PRINTING" + this);
 }
 
-for(let i = 0; i < 5; i ++) {
 showPoi(examplePoi);
-}
 
-// document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
+document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
 
 
 function saveRoom(poi) {

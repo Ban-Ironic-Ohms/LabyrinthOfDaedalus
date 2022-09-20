@@ -80,19 +80,6 @@ body, html {
     line-height: 40px;
 }
 
-.input_field_holder {
-    height: fit-content;
-    padding: 3px;
-}
-
-.input_field_holder.even {
-    background-color: gray;
-}
-
-.input_field_holder.odd {
-    background-color: ;
-}
-
 h1{
     text-align: center;
 }
@@ -102,6 +89,19 @@ text{
     width: 100%;
     align-items: center;
 }
+
+.input_field_holder, .name_field_holder {
+    height: fit-content;
+    padding: 3px;
+}
+
+.input_field_holder.even, .name_field_holder.even {
+    background-color: gray;
+}
+
+/* .input_field_holder.odd {
+    background-color: ;
+} */
 
 .input_field_holder input {
     position: relative;
@@ -119,4 +119,8 @@ text{
 
 .input_field_name {
     margin-left: 10px;
+}
+
+.selection_field_holder .input_field_holder .input_field_name {
+    margin-left: 20px;
 }
