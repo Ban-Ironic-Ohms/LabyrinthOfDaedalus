@@ -14,83 +14,112 @@
 // My understanding is that it needs to be called as a module in the html (type="module") but I can't get it to work
 // But then it gives errors when I make a variable without declaring it's type (var, let, const)
 
-light_gray = true;
+// class Poi {
+//     constructor(classes) {
+//         this.data = {
+//             // So yeah... this happened.
+//             // So heres the deal. JavaScript sucks and you cant pass a refrence trough a function.
+//             // Somewhere along the function chain, the refrence gets converted into a variable.
+//             // This means that if you try to change the value of the variable, it will not change the value of the refrence. (because the refrence was lost)
+//             // Back to how JS sucks - some thigs are passed by refrence, some are passed by value.
+//             // The difference is the type of object you pass. A string is passed by value, an object is passed by refrence.
+//             // A list is passed by value.
+//             // So, if you want to pass a refrence, you have to pass an object.
+//             // This is why I have to pass an object with a single value.
+//             // THIS IS SO STUPID.
+//             // I hate JS.
+//             // I hate JS.
+//             // ... you get the point.
 
-class Poi {
-    constructor(classes) {
-        this.data = {
-            // So yeah... this happened.
-            // So heres the deal. JavaScript sucks and you cant pass a refrence trough a function.
-            // Somewhere along the function chain, the refrence gets converted into a variable.
-            // This means that if you try to change the value of the variable, it will not change the value of the refrence. (because the refrence was lost)
-            // Back to how JS sucks - some thigs are passed by refrence, some are passed by value.
-            // The difference is the type of object you pass. A string is passed by value, an object is passed by refrence.
-            // A list is passed by value.
-            // So, if you want to pass a refrence, you have to pass an object.
-            // This is why I have to pass an object with a single value.
-            // THIS IS SO STUPID.
-            // I hate JS.
-            // I hate JS.
-            // ... you get the point.
-
-            // SO! This means we can't just pass this class onto firebase, unless we want to fuck everyrthing up.
-            // So we need another function to take this class and convert it into a JSON object / normal js dictionary without the objects.
+//             // SO! This means we can't just pass this class onto firebase, unless we want to fuck everyrthing up.
+//             // So we need another function to take this class and convert it into a JSON object / normal js dictionary without the objects.
             
-            // Another issue may arise if we need to go back and edit the data (i.e. edit a room).
-            // But BouncyPantaloons has gladly offered to do that in it's entierty
-            // So we can just have him do that.
-            // I'm not going to do it.
-            // I'm not going to do it. yay!
-            // ... you get the point.
+//             // Another issue may arise if we need to go back and edit the data (i.e. edit a room).
+//             // But BouncyPantaloons has gladly offered to do that in it's entierty
+//             // So we can just have him do that.
+//             // I'm not going to do it.
+//             // I'm not going to do it. yay!
+//             // ... you get the point.
             
-            // Hours lost to this issue: 4 - incriment as necessary
+//             // Hours lost to this issue: 4 - incriment as necessary
 
-            //For the record I did no't agree to do all the js -B.P.
+//             //For the record I did no't agree to do all the js -B.P.
 
-            // General Data
-            name: {value: null},
-            id: {value: null},
-            url: {value: null},
-            class: {value: classes},
-            descriptions: {
-                main_description: {value: null},
-                door_description: {value: null},
-                attack_description: {value: null},
-            },
-            rarity: {value: null},
-            value: {value: null},
-            poi: {value: []},
+//             // General Data
+//             name: {value: null},
+//             id: {value: null},
+//             url: {value: null},
+//             class: {value: classes},
+//             descriptions: {
+//                 main_description: {value: null},
+//                 door_description: {value: null},
+//                 attack_description: {value: null},
+//             },
+//             rarity: {value: null},
+//             value: {value: null},
+//             poi: {value: []},
 
-            // Consumable
-            effect: {value: null},
+//             // Consumable
+//             effect: {value: null},
 
-            // Entity Data
-            hp: {value: null},
-            dmg: {value: null},
-            passive_perception: {value: null},
-        }
+//             // Entity Data
+//             hp: {value: null},
+//             dmg: {value: null},
+//             passive_perception: {value: null},
+//         }
+//     }
+// }
+
+function capitalize(str) {
+  let words = str.includes("_") ? str.split("_") : str.split(" ");
+  for(let i = 0; i < words.length; i++) {
+    words[i] = words[i][0].toUpperCase() + words[i].substring(1);
+  }
+  return words.join(" ")
+}
+
+let examplePoi = {
+  name: "Room",
+  class: ["room", "container"],
+  poi: [
+    {
+      name: "Chest",
+      class: [],
+      poi: [{name: "Potion", class: []}, {name: "Key", class: []}]
+    },
+    {
+      name: "Waterfall",
+      class: [],
+      poi: [{name: "Slime", class: []}]
+    },
+    {
+      name: "Key",
+      class: []
     }
+  ]
+}
+examplePoi = {
+  name: "Room",
+  class: ["room", "container"],
+  poi: []
 }
 
-room = new Poi(["room", "enemy", "container"]);
-
-inputTypes = {
-  text: "text",
-  number: "number",
-  placeholder: "placeholder",
-  none: "none"
+let inputTypes = {
+  text: {inputType: "input", options: "text"},
+  number: {inputType: "input", options: "number"},
+  select: (multiple, items) => { return {inputType: "select", options: {multiple: multiple, list: items}} },
+  none: {inputType: "none"}
 }
 
-classes = {
-  base_class: {
+let classes = {
+  poi: {
       name: inputTypes.text,
-      class: inputTypes.placeholder,
+      class: inputTypes.select(true, ["room", "container", "enemy"]),
       descriptions: {
           main_description: inputTypes.text
       }
   },
   room: {
-      poi: inputTypes.placeholder,
       id: inputTypes.number,
       descriptions: {
         door_description: inputTypes.text
@@ -99,8 +128,8 @@ classes = {
       rarity: inputTypes.none
   },
   container: {
-      size: inputTypes.number,
-      poi: inputTypes.placeholder
+      poi: inputTypes.select(false, ["Child poi 1", "Child poi 2"]),
+      size: inputTypes.number
   },
   enemy: {
     descriptions: {
@@ -109,78 +138,73 @@ classes = {
   }
 }
 
-function ShowPoi(poi) {
-    let main = document.createElement('div');
-    main.id = "main";
+function showPoi(poi) {
+    let poiDiv = document.createElement('div');
+    poiDiv.classList.add("poi");
 
-    if (poi.data.class.value.includes("room")) {
-        CreateSection(poi, "Room", main, [["text", "Room Name", poi.data.name], ["text", "Main Description", poi.data.descriptions.main_description], ["selection", "Class(s)", poi.data.class, ["room", "container", "enemy", "item", "consumable"]]]);
+    createSection(poi, "poi", poiDiv)
+
+    for(let i = 0; i < poi["class"].length; i++) {
+      createSection(poi, poi["class"][i], poiDiv)
     }
 
-    // if (poi.classes.includes("enemy")) {
-    //     CreateSection(poi, "Door", base, [["text", "Description", poi.name], ["input", "Child Pois?", poi.name]]);
-    // }
-
-    // if (poi.classes.includes("container")) {
-    //     CreateSection(poi, "Pois", base, [["text", "Description", poi.name], ["input", "Child Pois?", poi.name]]);
-    // }
-
-    document.body.appendChild(main);
+    document.getElementById("main").appendChild(poiDiv);
 }
 
-function CreateSection(poi, section_name, parent, items) {
+function addInput(dict, key, input, parentSection, counter) {
+  let inputType = input.inputType;
+  let options = input.options;
+
+  if (inputType == "input") {
+    field = createInputField(capitalize(key), options, parentSection, counter);
+    field.addEventListener("input", (event) => {
+        dict[key] = event.srcElement.value;
+    })
+  } else if(inputType == "select") {
+    field = createSelectionField(capitalize(key), options, parentSection, counter);
+    field.addEventListener("change", (event) => {
+        dict[key] = GetSelectValues(event.srcElement);
+    });
+  }
+}
+
+function createSection(poi, className, parent) {
     let section_base = document.createElement('div');
+    section_base.classList.add("section");
 
-    section_base.id = "section";
-    section_base.style.width = "90%"
-    section_base.style.marginLeft = "5%"
-    section_base.style.outline = '3px dashed black';
-    section_base.height = "10px";
-
-    header = document.createElement("h1");
-    header.innerHTML = section_name;
-    header.style.height = "17px";
+    let header = document.createElement("h1");
+    header.innerHTML = capitalize(className);
     section_base.appendChild(header);
 
-
-    for (let i = 0; i < items.length; i++) {
-        function saveInput(variable, event) {
-            variable.value = event.srcElement.value;
-            console.log(poi);
-        }
-
-        function saveSelection(variable, event) {
-            variable.value = GetSelectValues(event.srcElement);
-            console.log(poi);
-        }
-
-        
-        if (items[i][0] == "selection") {
-            field = CreateSelectionField(items[i][1], items[i][3], section_base);
-            field.addEventListener("change", saveSelection.bind(this, items[i][2]));
+    let counter = 0;
+    for(let key in classes[className]) {
+      let dict = classes[className][key]
+      if(!("inputType" in dict)) {
+        for(let secondaryKey in dict) {
+          if(!(key in poi)) {
+            poi[key] = {}
+          }
+          addInput(poi[key], secondaryKey, dict[secondaryKey], section_base, counter++)
+          
         } 
-        else {
-            field = CreateInputField(items[i][1], items[i][0], section_base);
-            field.addEventListener("input", saveInput.bind(this, items[i][2]))
-        }
+      }
+
+      addInput(poi, key, classes[className][key], section_base, counter++)
     }
+
     parent.appendChild(section_base);
 }
 
-function CreateInputField(input_field_name_str, type, parent) {
-    input_field_holder = document.createElement('div');
-    if (light_gray)
-        input_field_holder.style.backgroundColor = "darkgray" 
-        light_gray = !light_gray;
+function createInputField(input_field_name_str, type, parent, fieldNum) {
+    let input_field_holder = document.createElement('div');
+    input_field_holder.classList.add(fieldNum % 2 ? "odd" : "even")
+    input_field_holder.classList.add("input_field_holder");
 
-    input_field_holder.id = "input_field_holder"
-
-    input_field_name = document.createElement('text');
-    input_field_name.style.marginLeft = "25px"
+    let input_field_name = document.createElement('text');
+    input_field_name.classList.add("input_field_name")
     input_field_name.innerHTML = input_field_name_str;
 
-    input_field = document.createElement('input');
-    input_field.style.marginLeft = "25px"
+    let input_field = document.createElement('input');
     input_field.placeholder = input_field_name_str;
     input_field.type = type
 
@@ -190,31 +214,28 @@ function CreateInputField(input_field_name_str, type, parent) {
     return input_field_holder;
 }
 
-function CreateSelectionField(select_field_name_str, options, parent) {
-    input_field_holder = document.createElement('div');
-    if (light_gray)
-        input_field_holder.style.backgroundColor = "darkgray" 
-        light_gray = !light_gray;
+function createSelectionField(select_field_name_str, options, parent, fieldNum) {
+    let input_field_holder = document.createElement('div');
+    input_field_holder.classList.add(fieldNum % 2 ? "odd" : "even")
+    input_field_holder.classList.add("input_field_holder")
 
-    input_field_holder.id = "input_field_holder"
-
-    input_field_name = document.createElement('text');
-    input_field_name.style.marginLeft = "25px"
+    let input_field_name = document.createElement('text');
+    input_field_name.classList.add("input_field_name")
     input_field_name.innerHTML = select_field_name_str;
 
-    input_field = document.createElement('select');
-    input_field.style.marginLeft = "50px"
-    input_field.multiple = true;
+    let input_field = document.createElement('select');
+    input_field.multiple = options.multiple;
     // input_field.className += "chosen-select";
     input_field.id = "poi_type";
     input_field.name = "type_of_poi";
     input_field.width = "100px";
     input_field.placeholder = select_field_name_str;
 
-    for (let i = 0; i < options.length; i++) {
+    let list = options.list.map((word) => capitalize(word))
+    for (let i = 0; i < list.length; i++) {
         new_option = document.createElement("option");
-        new_option.value = options[i];
-        new_option.innerHTML = options[i];
+        new_option.value = list[i];
+        new_option.innerHTML = list[i];
         input_field.appendChild(new_option)
     }
 
@@ -245,58 +266,19 @@ function print() {
     console.log("PRINTING" + this);
 }
 
-
-class PoiDict {
-    constructor() {
-        this.data = {
-            name: null,
-            id: null,
-            url: null,
-            class: [],
-            descriptions: {
-                main_description: null,
-                door_description: null,
-                attack_description: null,
-            },
-            rarity: null,
-            value: null,
-            poi: [],
-            effect: null,
-            hp: null,
-            dmg: null,
-            passive_perception: null
-        }
-
-    }
-}
-for(let i = 0; i < 5; i++) {
-  ShowPoi(room);
+for(let i = 0; i < 5; i ++) {
+showPoi(examplePoi);
 }
 
-// document.getElementById("set_room").addEventListener("click", function () {SaveRoom(room)})
+// document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
 
 
-function SaveRoom(poi) {
-    console.log("poi");
-    ret = new PoiDict();
+function saveRoom(poi) {
+  // No longer need to create new PoiDict, since poi is already in the correct format.
+  console.log(poi);
 
-    ret.data.name = poi.data.name.value;
-    ret.data.id = poi.data.id.value;
-    ret.data.url = poi.data.url.value;
-    ret.data.class = poi.data.class.value;
-    ret.data.descriptions.main_description = poi.data.descriptions.main_description.value;
-    ret.data.descriptions.door_description = poi.data.descriptions.door_description.value;
-    ret.data.descriptions.attack_description = poi.data.descriptions.attack_description.value;
-    ret.data.rarity = poi.data.rarity.value;
-    ret.data.value = poi.data.value.value;
-    ret.data.poi = poi.data.poi.value;
-    ret.data.effect = poi.data.effect.value;
-    ret.data.hp = poi.data.hp.value;
-    ret.data.dmg = poi.data.dmg.value;
-    ret.data.passive_perception = poi.data.passive_perception.value;
-
-    const room_ref = ref(database, '/rooms' + ret.data.id);
-    set(room_ref, ret.data);
+  const room_ref = ref(database, '/rooms' + poi.id);
+  set(room_ref, poi);
 }
 
 

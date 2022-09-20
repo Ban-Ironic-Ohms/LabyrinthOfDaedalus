@@ -1,6 +1,6 @@
 :root {
     --padding: 10px;
-    --border-width: 15px;
+    --border-width: 5px;
 }
 
 html {
@@ -12,10 +12,16 @@ body, html {
     margin: 0;
     height: 100%;
     width: 100%;
-    overflow-x: hidden;
+}
+
+#main {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     overflow-y: hidden;
-    /* width: fit-content;
-    white-space: nowrap; */
+    overflow-x: auto;
+    
+    white-space: nowrap;
 }
 
 .tab1 {
@@ -32,29 +38,59 @@ body, html {
     color: rgb(80, 80, 80);
 }
 
-#main {
-    /* margin-top: var(--padding); */
+.poi {
+    display: inline-block;
+    margin-top: var(--padding);
     margin-left: var(--padding);
-    padding-top: var(--padding);
     border-width: var(--border-width);
     border-style: solid;
     border-color: black;
     border-radius: 3px;
     
-    height: calc(100% - 2 * var(--border-width));
+    height: calc(100% - 2 * var(--padding) - 2 * var(--border-width));
     width: calc(25vw - var(--padding) * (1 + 1/4) - 2 * var(--border-width));
-    background-color: rgb(245, 169, 184);
-    float: left;
+    background-color: darkgray;
+
+    white-space: normal;
+
+    overflow-y: auto;
 }
 
-#section{
-    margin-top: 15px;
-    padding-top: px;
+.section {
+    --border-width: 3px;
+    margin-top: var(--padding);
+    width: calc(100% - 2 * var(--padding) - 2 * var(--border-width));
+    margin-left: var(--padding);
     border-radius: 3px;
+    
+    border-width: var(--border-width);
+    border-style: dashed; 
+    border-color: black;
+    height: "10px";
 }
 
-#input_field_holder{
+.section:last-child {
+    margin-bottom: var(--padding);
+}
+
+.section h1 {
+    margin: 0px;
+    height: 40px;
+    font-size: 30px;
+    line-height: 40px;
+}
+
+.input_field_holder {
+    height: fit-content;
     padding: 3px;
+}
+
+.input_field_holder.even {
+    background-color: gray;
+}
+
+.input_field_holder.odd {
+    background-color: ;
 }
 
 h1{
@@ -67,11 +103,20 @@ text{
     align-items: center;
 }
 
-input{
+.input_field_holder input {
+    position: relative;
     align-items: center;
     color: black;
     background-color: rgb(224, 224, 224);
     border: 2px solid black;
     width: 50%;
+    margin-left: 10px;
 }
 
+.input_field_holder select {
+    margin-left: 10px;
+}
+
+.input_field_name {
+    margin-left: 10px;
+}
