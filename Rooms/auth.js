@@ -1,4 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "../node_modules/firebase/firebase-auth.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAy70cBoQiHhkKCu2DQBiA31HOlEiSMNpY",
@@ -20,10 +22,11 @@ var ui = new firebaseui.auth.AuthUI(firebase.auth());
 ui.start('#firebaseui-auth-container', {
     signInOptions: [
       // List of OAuth providers supported.
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID
+      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
     //   firebase.auth.FacebookAuthProvider.PROVIDER_ID,
     //   firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-    //   firebase.auth.GithubAuthProvider.PROVIDER_ID
+      // firebase.auth.GithubAuthProvider.PROVIDER_ID
+      firebase.auth.EmailAuthProvider.PROVIDER_ID
     ],
     // Other config options...
   });
@@ -45,21 +48,29 @@ callbacks: {
 },
 // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
 signInFlow: 'popup',
-signInSuccessUrl: '<url-to-redirect-to-on-success>',
+signInSuccessUrl: 'jsonGenWeb.html',
 signInOptions: [
-    // Leave the lines as is for the providers you want to offer your users.
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID
-//   firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-//   firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-//   firebase.auth.GithubAuthProvider.PROVIDER_ID,
-//   firebase.auth.EmailAuthProvider.PROVIDER_ID,
-//   firebase.auth.PhoneAuthProvider.PROVIDER_ID
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    firebase.auth.EmailAuthProvider.PROVIDER_ID,
 ],
+
 // Terms of service url.
-tosUrl: 'googel.com',
+tosUrl: 'google.com',
 // Privacy policy url.
 privacyPolicyUrl: 'google.com'
 };
 
 // The start method will wait until the DOM is loaded.
 ui.start('#firebaseui-auth-container', uiConfig);
+
+const auth = getAuth();
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/firebase.User
+    const uid = user.uid;
+    console.log("uid")
+  } else {
+    console.log("DEATH TO USERS")
+  }
+});
