@@ -264,14 +264,14 @@ function CreateSelectionFieldMultiple(select_field_name_str, list, parent, field
 
     var input_field_name = document.createElement('span');
     input_field_name.classList.add("input_field_name")
-    input_field_name.innerHTML = select_field_name_str;
+    input_field_name.innerHTML = capitalize(select_field_name_str);
     name_field_holder.appendChild(input_field_name);
 
     var fields = [];
 
     var selectedItems = []
     for (let i = 0; i < list.length; i++) {
-        [fields[i], fieldNum] = (createInputField(list[i], "checkbox", selection_field_holder, fieldNum));
+        [fields[i], fieldNum] = (createInputField("&nbsp⦿ " + capitalize(list[i]), "checkbox", selection_field_holder, fieldNum));
         fields[i].addEventListener("change", (event) => {
           console.log(event.srcElement.checked)
           if(event.srcElement.checked) {
@@ -331,7 +331,9 @@ function saveRoom(poi) {
 
 let room = getBaseRoom();
 
-showPoi(room);
+for(let i in [1, 2, 4, 5, 5]) {
+  showPoi(room);
+}
 
 document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
 

@@ -3,18 +3,17 @@
     --border-width: 5px;
     --inner-border-width: 3px;
     --columns-per-page: 4;
+    --poi-width: calc(100% / var(--columns-per-page) - var(--padding) * (1 + 1/var(--columns-per-page)) - 2 * var(--border-width));
+    /* --poi-width: 300px; */
+    --save-button-height: 35px;
+    --save-button-border-width: var(--border-width);
 }
-
-html {
-    margin: 0;
-    height: 100%;
-}
-
 body, html {
     margin: 0;
     height: 100%;
     width: 100%;
     user-select: none;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 #main {
@@ -27,40 +26,45 @@ body, html {
     white-space: nowrap;
 }
 
-.tab1 {
-    margin-left: 40px;
-}
-.number-selector {
-    width: 40px;
-}
-.example {
-    input-security: none;
-}
-.preview {
-    margin-left: 20%;
-    color: rgb(80, 80, 80);
-}
-
-.poi {
+.poi, #set_room {
     display: inline-block;
     margin-top: var(--padding);
     margin-left: var(--padding);
-    border-width: var(--border-width);
+    width: var(--poi-width);
+    border-width: var(--save-button-border-width);
     border-style: solid;
     border-color: black;
     border-radius: 3px;
-    
+}
+.poi {
     height: calc(100% - 2 * var(--padding) - 2 * var(--border-width));
-    width: calc(100% / var(--columns-per-page) - var(--padding) * (1 + 1/var(--columns-per-page)) - 2 * var(--border-width));
     background-color: darkgray;
 
     white-space: normal;
-
     overflow-y: auto;
 }
-
 .poi:last-child {
     margin-right: var(--padding);
+}
+.poi:nth-child(2) {
+    margin-top: calc(2 * var(--padding) + 2 * var(--save-button-border-width) + var(--save-button-height));
+    height: calc(100% - 3 * var(--padding) - 4 * var(--border-width) - var(--save-button-height));
+}
+
+#set_room {
+    position: absolute;
+    height: var(--save-button-height);
+    line-height: var(--save-button-height);
+    font-size: 20px;
+    background-color: lightgray;
+    text-align: center;
+    font-weight: bold;
+}
+#set_room:hover {
+    background-color: darkgray;
+}
+#set_room:active {
+    background-color: gray;
 }
 
 .section {
@@ -73,56 +77,51 @@ body, html {
     border-style: dashed; 
     border-color: black;
     height: "10px";
-}
 
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+}
 .section:last-child {
     margin-bottom: var(--padding);
 }
-
 .section h1 {
-    margin: 0px;
-    height: 40px;
-    font-size: 30px;
-    line-height: 40px;
-}
-
-h1{
     text-align: center;
+    margin: 0px;
+    height: fit-content;
+    font-size: 30px;
 }
 
 .input_field_holder, .name_field_holder {
+    display: flex;
     color: white;
     height: fit-content;
     padding: 3px;
 }
-
 .input_field_holder.even, .name_field_holder.even {
     background-color: gray;
 }
-
-/* .input_field_holder.odd {
+/* .input_field_holder.odd, .name_field_holder.odd {
     background-color: ;
 } */
 
+.input_field_name {
+    margin-left: 10px;
+}
+.input_field_holder input, .input_field_holder select {
+    margin-right: 10px;
+    margin-left: auto;
+}
+
 .input_field_holder input {
-    position: relative;
     align-items: center;
     color: black;
     background-color: rgb(224, 224, 224);
     border: 2px solid black;
     width: 50%;
-    margin-left: 10px;
 }
 
-.input_field_holder select {
-    margin-left: 10px;
-}
-
-.input_field_name {
-    margin-left: 10px;
-}
-
-.selection_field_holder .input_field_holder .input_field_name {
-    /* Indents the elements of a list field */
-    margin-left: 20px;
+.input_field_holder input[type="checkbox"] {
+    height: 18px;
+    width: 18px;
+    margin-right: 27%;
 }
