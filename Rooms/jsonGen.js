@@ -79,24 +79,24 @@ function capitalize(str) {
   return words.join(" ")
 }
 
-function addClassToPoi(poi, className) {
-  if("class" in poi) {
-    poi["class"].push(className);
-  }
-  for(let key in classes[className]) {
-    poi[key] = classes[className][key].default;
-  }
-}
+// function addClassToPoi(poi, className) {
+//   if("class" in poi) {
+//     poi["class"].push(className);
+//   }
+//   for(let key in classes[className]) {
+//     poi[key] = classes[className][key].default;
+//   }
+// }
 
-function getBaseRoom() {
-  let poi = {}
-  addClassToPoi(poi, "poi");
-  addClassToPoi(poi, "room");
-  addClassToPoi(poi, "container");
-  poi.name = "Room"
+// function getBaseRoom() {
+//   let poi = {}
+//   addClassToPoi(poi, "poi");
+//   addClassToPoi(poi, "room");
+//   addClassToPoi(poi, "container");
+//   poi.name = "Room"
 
-  return poi;
-}
+//   return poi;
+// }
 
 function setToValue(dict, key, newValue) {
   dict[key] = newValue
@@ -104,16 +104,16 @@ function setToValue(dict, key, newValue) {
 
 let inputTypes = {
   // TODO: Have to figure out when & when not to autofill the default / previously-entered values
-  text: (def="", onChange=setToValue) => ({default: def, inputType: "input", options: "text", onChange: onChange}),
-  number: (def, onChange=setToValue) => ({default: def, inputType: "input", options: "number", onChange: onChange}),
-  select: (def, multiple, items, onChange=setToValue) => ({default: def, inputType: "select", options: {multiple: multiple, list: items}, onChange: onChange}),
-  none: (def=undefined) => ({default: def, inputType: "none"})
+  text: (def="", onChange=setToValue, fillDefault=false) => ({default: def, inputType: "input", options: "text", onChange: onChange, fillDefault: fillDefault}),
+  number: (def, onChange=setToValue, fillDefault=false) => ({default: def, inputType: "input", options: "number", onChange: onChange, fillDefault: fillDefault}),
+  select: (def, multiple, items, onChange=setToValue, fillDefault=false) => ({default: def, inputType: "select", options: {multiple: multiple, list: items}, onChange: onChange, fillDefault: fillDefault}),
+  none: (def=undefined, fillDefault=false) => ({default: def, inputType: "none", fillDefault})
 }
 
 let classes = {
   poi: {
       name: inputTypes.text("Poi"),
-      class: inputTypes.select([], true, ["room", "container", "enemy"]),
+      class: inputTypes.select(["container"], true, ["room", "container", "enemy"]),
       descriptions: {
           main_description: inputTypes.text()
       }
@@ -127,7 +127,7 @@ let classes = {
       rarity: inputTypes.none()
   },
   container: {
-      poi: inputTypes.select([], false, ["Child poi 1", "Child poi 2"]),
+      poi: inputTypes.select("Child Poi 1", false, ["Child poi 1", "Child poi 2"]),
       size: inputTypes.number(0)
   },
   enemy: {
@@ -182,27 +182,37 @@ function addInput(dict, key, input, parentSection, counter) {
   let options = input.options;
   let field;
 
+  let defaultValue = null;
+  if(!(key in dict)) {
+    dict[key] = input.default;
+    if(input.fillDefault) {
+      defaultValue = input.default;
+    }
+  } else {
+    defaultValue = dict[key];
+  }
+
   if (inputType == "input") {
-    [field, counter] = createInputField(capitalize(key), options, parentSection, counter);
+    [field, counter] = createInputField(capitalize(key), options, parentSection, counter, defaultValue);
     field.addEventListener("input", (event) => {
       input.onChange(dict, key, event.srcElement.value);
     })
   } else if(inputType == "select" && !options.multiple) {
-    [field, counter] = createSelectionField(capitalize(key), options.list, parentSection, counter);
+    [field, counter] = createSelectionField(capitalize(key), options.list, parentSection, counter, defaultValue);
     field.addEventListener("change", (event) => {
       input.onChange(dict, key, event.srcElement.value);
     });
   } else if(inputType == "select" && options.multiple) {
     [field, counter] = CreateSelectionFieldMultiple(capitalize(key), options.list, parentSection, counter, (values) => {
       input.onChange(dict, key, values)
-    });
+    }, defaultValue);
     
   }
 
   return counter
 }
 
-function createInputField(input_field_name_str, type, parent, fieldNum) {
+function createInputField(input_field_name_str, type, parent, fieldNum, defaultValue=null) {
     let input_field_holder = document.createElement('div');
     input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
     input_field_holder.classList.add("input_field_holder");
@@ -214,6 +224,9 @@ function createInputField(input_field_name_str, type, parent, fieldNum) {
     let input_field = document.createElement('input');
     input_field.placeholder = input_field_name_str;
     input_field.type = type
+    if(defaultValue != null) {
+      input_field.value = defaultValue;
+    }
 
     input_field_holder.appendChild(input_field_name);
     input_field_holder.appendChild(input_field);
@@ -221,7 +234,7 @@ function createInputField(input_field_name_str, type, parent, fieldNum) {
     return [input_field_holder, fieldNum];
 }
 
-function createSelectionField(select_field_name_str, list, parent, fieldNum) {
+function createSelectionField(select_field_name_str, list, parent, fieldNum, defaultValue=null) {
     let input_field_holder = document.createElement('div');
     input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
     input_field_holder.classList.add("input_field_holder")
@@ -246,6 +259,8 @@ function createSelectionField(select_field_name_str, list, parent, fieldNum) {
         input_field.appendChild(new_option)
     }
 
+    input_field.value = defaultValue;
+
     input_field_holder.appendChild(input_field_name);
     input_field_holder.appendChild(input_field);
     parent.appendChild(input_field_holder);
@@ -253,7 +268,7 @@ function createSelectionField(select_field_name_str, list, parent, fieldNum) {
     return [input_field_holder, fieldNum];
 }
 
-function CreateSelectionFieldMultiple(select_field_name_str, list, parent, fieldNum, onChange) {
+function CreateSelectionFieldMultiple(select_field_name_str, list, parent, fieldNum, onChange, defaultValue=null) {
     var selection_field_holder = document.createElement('div');
     selection_field_holder.classList.add("selection_field_holder")
 
@@ -273,13 +288,12 @@ function CreateSelectionFieldMultiple(select_field_name_str, list, parent, field
     for (let i = 0; i < list.length; i++) {
         [fields[i], fieldNum] = (createInputField("&nbsp⦿ " + capitalize(list[i]), "checkbox", selection_field_holder, fieldNum));
         fields[i].addEventListener("change", (event) => {
-          console.log(event.srcElement.checked)
           if(event.srcElement.checked) {
             selectedItems.push(list[i]);
           } else {
             selectedItems.splice(selectedItems.indexOf(list[i]), 1);
           }
-          onChange(selectedItems)
+          onChange(selectedItems);
         })
     }
 
@@ -329,9 +343,9 @@ function saveRoom(poi) {
 }
 
 
-let room = getBaseRoom();
+let room = {};
 
-for(let i in [1, 2, 4, 5, 5]) {
+for(let i in [1]) {
   showPoi(room);
 }
 
