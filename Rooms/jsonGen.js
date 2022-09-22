@@ -12,15 +12,7 @@ const database = getDatabase(app);
 const db = getDatabase();
 
 console.log("jsonGen.js loaded");
-const auth = getAuth()
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("OOGOA BOOOGA")
-  }
-  else {
-    console.log("NO USER")
-  }
-});
+
 
 // class Poi {
 //     constructor(classes) {
