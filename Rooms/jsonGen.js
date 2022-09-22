@@ -1,18 +1,26 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "../node_modules/firebase/firebase-auth.js";
+
 
 const firebaseConfig = {
-    databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
+  databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
 };
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const db = getDatabase();
 
-
-// This all is not working ^^
-// My understanding is that it needs to be called as a module in the html (type="module") but I can't get it to work
-// But then it gives errors when I make a variable without declaring it's type (var, let, const)
+console.log("jsonGen.js loaded");
+const auth = getAuth()
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("OOGOA BOOOGA")
+  }
+  else {
+    console.log("NO USER")
+  }
+});
 
 // class Poi {
 //     constructor(classes) {
