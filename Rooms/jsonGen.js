@@ -338,6 +338,7 @@ function saveRoom(poi) {
 
   console.log(poi);
 
+  
   const room_ref = ref(database, '/rooms/' + poi.id);
   set(room_ref, poi);
 }

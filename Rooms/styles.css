@@ -13,6 +13,8 @@ body, html {
     height: 100%;
     width: 100%;
     user-select: none;
+    image-rendering: pixelated;
+    background-color: black;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
@@ -65,6 +67,14 @@ body, html {
 }
 #set_room:active {
     background-color: gray;
+}
+
+#header{ 
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 75%;
+    image-rendering: pixelated;
 }
 
 .section {
