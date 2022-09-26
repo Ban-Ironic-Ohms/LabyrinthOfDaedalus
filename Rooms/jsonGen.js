@@ -1,18 +1,18 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "../node_modules/firebase/firebase-auth.js";
+// import { generateID, pureRandom } from "./id_generator.js";
 
 const firebaseConfig = {
-    databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
+  databaseURL: "https://labyrinthofdaedalus-79a5f-default-rtdb.firebaseio.com/",
 };
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const db = getDatabase();
 
+console.log("jsonGen.js loaded");
 
-// This all is not working ^^
-// My understanding is that it needs to be called as a module in the html (type="module") but I can't get it to work
-// But then it gives errors when I make a variable without declaring it's type (var, let, const)
 
 function capitalize(str) {
   // Takes in a string of words separated by spaces or underscores, returns a string of words separated by spaces with each first letter capitalized
@@ -418,23 +418,37 @@ function saveRoom(poi) {
 
   console.log(poi);
 
+  poi.id = generateID();
+  console.log(poi.id);
   const room_ref = ref(database, '/rooms/' + poi.id);
-  set(room_ref, poi);
+  onValue(room_ref, (snapshot) => {
+    if ( snapshot.val() != null ) {
+      console.log("Room with that ID already exists - you just expirenced a one-in-2.27-thousand-quintillion-quintillion-quintillion chance. And yes, I wrote a case for it");
+      saveRoom(poi);
+    } else {
+      set(room_ref, poi);
+    }
+  }, {
+    onlyOnce: true
+  });
+}
+
+function generateID() {
+  // generates a random 32 character string - letters and numbers, no special characters
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < 32; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 
-let room = {};
+let room = { };
 
 for(let i in [1]) {
   addPoi(room);
 }
 
 document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
-
-
-// IGNORE THIS - these are not the droids you are looking for
-// $(".chosen-select").chosen({
-//     no_results_text: "Oops, nothing found!"
-//   })
-
-//   $('.chosen-select').on("change", function(e) {console.log(e)});
