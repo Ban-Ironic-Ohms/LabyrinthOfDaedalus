@@ -14,106 +14,61 @@ const db = getDatabase();
 // My understanding is that it needs to be called as a module in the html (type="module") but I can't get it to work
 // But then it gives errors when I make a variable without declaring it's type (var, let, const)
 
-// class Poi {
-//     constructor(classes) {
-//         this.data = {
-//             // So yeah... this happened.
-//             // So heres the deal. JavaScript sucks and you cant pass a refrence trough a function.
-//             // Somewhere along the function chain, the refrence gets converted into a variable.
-//             // This means that if you try to change the value of the variable, it will not change the value of the refrence. (because the refrence was lost)
-//             // Back to how JS sucks - some thigs are passed by refrence, some are passed by value.
-//             // The difference is the type of object you pass. A string is passed by value, an object is passed by refrence.
-//             // A list is passed by value.
-//             // So, if you want to pass a refrence, you have to pass an object.
-//             // This is why I have to pass an object with a single value.
-//             // THIS IS SO STUPID.
-//             // I hate JS.
-//             // I hate JS.
-//             // ... you get the point.
-
-//             // SO! This means we can't just pass this class onto firebase, unless we want to fuck everyrthing up.
-//             // So we need another function to take this class and convert it into a JSON object / normal js dictionary without the objects.
-            
-//             // Another issue may arise if we need to go back and edit the data (i.e. edit a room).
-//             // But BouncyPantaloons has gladly offered to do that in it's entierty
-//             // So we can just have him do that.
-//             // I'm not going to do it.
-//             // I'm not going to do it. yay!
-//             // ... you get the point.
-            
-//             // Hours lost to this issue: 4 - incriment as necessary
-
-//             //For the record I did no't agree to do all the js -B.P.
-
-//             // General Data
-//             name: {value: null},
-//             id: {value: null},
-//             url: {value: null},
-//             class: {value: classes},
-//             descriptions: {
-//                 main_description: {value: null},
-//                 door_description: {value: null},
-//                 attack_description: {value: null},
-//             },
-//             rarity: {value: null},
-//             value: {value: null},
-//             poi: {value: []},
-
-//             // Consumable
-//             effect: {value: null},
-
-//             // Entity Data
-//             hp: {value: null},
-//             dmg: {value: null},
-//             passive_perception: {value: null},
-//         }
-//     }
-// }
-
 function capitalize(str) {
   // Takes in a string of words separated by spaces or underscores, returns a string of words separated by spaces with each first letter capitalized
   let words = str.includes("_") ? str.split("_") : str.split(" ");
+  if(words.length == 0 || (words.length == 1 && words[0] == "")) {
+    return "";
+  }
   for(let i = 0; i < words.length; i++) {
     words[i] = words[i][0].toUpperCase() + words[i].substring(1);
   }
-  return words.join(" ")
+  return words.join(" ");
 }
 
-// function addClassToPoi(poi, className) {
-//   if("class" in poi) {
-//     poi["class"].push(className);
-//   }
-//   for(let key in classes[className]) {
-//     poi[key] = classes[className][key].default;
-//   }
-// }
-
-// function getBaseRoom() {
-//   let poi = {}
-//   addClassToPoi(poi, "poi");
-//   addClassToPoi(poi, "room");
-//   addClassToPoi(poi, "container");
-//   poi.name = "Room"
-
-//   return poi;
-// }
-
-function setToValue(dict, key, newValue) {
+function setToValue(dict, key, newValue, sectionDiv) {
   dict[key] = newValue
 }
 
 let inputTypes = {
   // TODO: Have to figure out when & when not to autofill the default / previously-entered values
-  text: (def="", onChange=setToValue, fillDefault=false) => ({default: def, inputType: "input", options: "text", onChange: onChange, fillDefault: fillDefault}),
-  number: (def, onChange=setToValue, fillDefault=false) => ({default: def, inputType: "input", options: "number", onChange: onChange, fillDefault: fillDefault}),
-  select: (def, multiple, items, onChange=setToValue, fillDefault=false) => ({default: def, inputType: "select", options: {multiple: multiple, list: items}, onChange: onChange, fillDefault: fillDefault}),
-  none: (def=undefined, fillDefault=false) => ({default: def, inputType: "none", fillDefault})
+  // TODO: How are we setting the grayed out background text of text inputs? Can we customize them?
+  text: (def="", onChange=setToValue, fillDefault=false, onCreate=(_) => {}) => 
+    ({default: def, inputType: "input", options: "text", onChange: onChange, fillDefault: fillDefault, onCreate: onCreate}),
+  number: (def, onChange=setToValue, fillDefault=false, onCreate=(_) => {}) => 
+    ({default: def, inputType: "input", options: "number", onChange: onChange, fillDefault: fillDefault, onCreate: onCreate}),
+  select: (def, multiple, items, onChange=setToValue, fillDefault=false, onCreate=(_) => {}) => 
+    ({default: def, inputType: "select", options: {multiple: multiple, list: items}, onChange: onChange, fillDefault: fillDefault, onCreate: onCreate}),
+  button: (text, onClick, onCreate=(_) => {}) => 
+    ({inputType: "button", options: {type: "button", text: text}, onClick: onClick, onCreate: onCreate}),
+  none: (def=undefined, fillDefault=false) => 
+    ({default: def, inputType: "none", fillDefault})
+}
+
+function findPoiSelectorInContainerSection(containerSection) {
+  let children = containerSection.children;
+  for(let i = 0; i < children.length; i++) {
+    if(children[i].classList.contains("input_field_holder")) {
+      let inputFieldChildren = children[i].children;
+      for(let j = 0; j < inputFieldChildren.length; j++) {
+        if(inputFieldChildren[j].classList.contains("poi_selector")) {
+          return inputFieldChildren[j];
+        }
+      }
+    }
+  }
 }
 
 let classes = {
   poi: {
-      name: inputTypes.text("Poi"),
-      class: inputTypes.select(["container"], true, ["room", "container", "enemy"]),
+      name: inputTypes.text("Poi", (dict, key, newValue, sectionDiv) => {
+        dict[key] = newValue;
+        sectionDiv.children[0].innerHTML = newValue;
+      }),
+      class: inputTypes.select([], true, ["room", "container", "enemy"], (dict, key, newValue, sectionDiv) => {        
+        dict[key] = newValue;
+        setSections(dict, sectionDiv.parentElement);
+      }),
       descriptions: {
           main_description: inputTypes.text()
       }
@@ -127,7 +82,28 @@ let classes = {
       rarity: inputTypes.none()
   },
   container: {
-      poi: inputTypes.select("Child Poi 1", false, ["Child poi 1", "Child poi 2"]),
+      poi: [
+        inputTypes.select([], false, [], (dict, key, newValue, sectionDiv) => {
+          removePoi(1 + sectionDiv.parentElement.getAttribute("data-poi-layer"));
+          addPoi(dict["poi"][newValue])
+        }, undefined, (field) => {console.log(field); field.classList.add("poi_selector")}),
+        inputTypes.button("+", (sectionDiv) => {
+          let selector = findPoiSelectorInContainerSection(sectionDiv);
+          let newOption = document.createElement("option");
+          newOption.value = {};
+          selector.appendChild(newOption);
+          selector.value = newOption.value;
+        }),
+        inputTypes.button("-", (sectionDiv) => {
+          let selector = findPoiSelectorInContainerSection(sectionDiv);
+          let children = selector.children;
+          for(let i = 0; i < children.length; i++) {
+            if(selector.value == children[i].value) {
+              selector.removeChild(children[i])
+            }
+          }
+        })
+      ],
       size: inputTypes.number(0)
   },
   enemy: {
@@ -137,44 +113,142 @@ let classes = {
   }
 }
 
-function showPoi(poi) {
+var poisOnScreen = 0;
+
+/** Adds a new column to the screen representing a POI.
+ * Creates and adds div with class "poi" that is background of column, 
+ * calls addSection to add base "poi" section, and again to add sections for each class poi has. 
+ * @param {Object} poi The POI to add to screen
+ */
+function addPoi(poi) {
     let poiDiv = document.createElement('div');
     poiDiv.classList.add("poi");
+    poiDiv.setAttribute("data-poi-layer", poisOnScreen++)
 
-    createSection(poi, "poi", poiDiv)
+    addSection(poi, "poi", poiDiv);
 
     for(let i = 0; i < poi["class"].length; i++) {
-      createSection(poi, poi["class"][i], poiDiv)
+      addSection(poi, poi["class"][i], poiDiv)
     }
 
     document.getElementById("main").appendChild(poiDiv);
 }
 
-function createSection(poi, className, parent) {
-    let section_base = document.createElement('div');
-    section_base.classList.add("section");
+function removePoi(layer) {
+  let poiDivs = document.getElementById("main").children;
+  for(let i = 0; i < poiDivs.length; i++) {
+    if(poiDivs[i].getAttribute("data-poi-layer") == layer) {
+      removePoi(layer + 1)
+      document.getElementById("main").removeChild(poiDivs[i]);
+      break;
+    }
+  }
+}
 
-    let header = document.createElement("h1");
-    header.innerHTML = capitalize(className);
-    section_base.appendChild(header);
+function setSections(poi, parentDiv) {
+  let sections = Array.from(parentDiv.children).filter(
+    (child) => child.classList.contains("section") && child.getAttribute("data-corresponding-class") != "poi");
+  let classes = poi["class"];
 
-    let counter = 0;
-    for(let key in classes[className]) {
-      let dict = classes[className][key]
-      if(!("inputType" in dict)) {
-        for(let secondaryKey in dict) {
-          if(!(key in poi)) {
-            poi[key] = {}
-          }
-          counter = addInput(poi[key], secondaryKey, dict[secondaryKey], section_base, counter)
-          
-        } 
+  for(let i = 0; i < classes.length; i++) {
+    let classAlreadyHasSection = false;
+    for(let j = 0; j < sections.length; j++) {
+      if(sections[j].getAttribute("data-corresponding-class") == classes[i]) {
+        classAlreadyHasSection = true;
+        break;
       }
+    }
+    if(!classAlreadyHasSection) {
+      console.log("adding", classes[i])
+      // For every class being added (because it doesn't have a section but it's in the list of classes):
+      addSection(poi, classes[i], parentDiv);
+    }
+  }
 
-      counter = addInput(poi, key, classes[className][key], section_base, counter)
+  for(let i = 0; i < sections.length; i++) {
+    let sectionClass = sections[i].getAttribute("data-corresponding-class")
+    // console.log(sectionClass, "in [", String(classes), "] =", sectionClass in classes)
+    let sectionClassInClasses = false;
+    for(let j = 0; j < classes.length; j++) {
+      if(sectionClass == classes[j]) {
+        sectionClassInClasses = true;
+        break;
+      }
     }
 
-    parent.appendChild(section_base);
+    if(!sectionClassInClasses) {
+      // For every class being removed (because it has a section but isn't in the list of classes):
+      removeSection(parentDiv, sectionClass);
+    }
+  }
+}
+
+/** Adds a section corresponding to a class name to a POI Div.
+ * Creates a section div and adds it to the POI Div. Creates a header for the section.
+ * Loops through all possible parameters that the class adds, and calls addInput for each one.
+ * @param {Object} poi Poi that the POI Div is representing.
+ * @param {String} className Name of the class corresponding to the section to be added.
+ * @param {HTMLElement} parentDiv Div to add the section to.
+ */
+function addSection(poi, className, parentDiv) {
+  let sectionBase = document.createElement('div');
+  sectionBase.classList.add("section");
+  sectionBase.setAttribute("data-corresponding-class", className);
+
+  let header = document.createElement("h1");
+  header.innerHTML = capitalize(className);
+  sectionBase.appendChild(header);
+
+  function callAddInput(dict, key, input, sectionBase, counter) {
+    if(input instanceof Array) {
+      for(let i = 0; i < input.length; i++) {
+        counter = addInput(dict, i == 0 ? key : "", input[i], sectionBase, counter)
+      }
+    } else {
+      counter = addInput(dict, key, input, sectionBase, counter)
+    }
+    return counter
+  }
+
+  let counter = 0;
+  for(let key in classes[className]) {
+    let dict = classes[className][key]
+
+    if("inputType" in dict || dict instanceof Array) {
+      counter = callAddInput(poi, key, classes[className][key], sectionBase, counter)
+    } else {
+      // If the selected element is actually a dict with inputs inside, loop through the dict instead.
+      for(let secondaryKey in dict) {
+        if(!(key in poi)) {
+          poi[key] = {}
+        }
+        counter = callAddInput(poi[key], secondaryKey, dict[secondaryKey], sectionBase, counter)
+      }
+    }
+
+    if(className == "poi") {
+      header.innerHTML = poi["name"]
+    }
+
+  }
+
+  parentDiv.appendChild(sectionBase);
+}
+
+/** Removes a section from a POI Div, given a class name.
+ * Loops through all elements that are a child of the POI Div. If they have the attribute corresponding to the class name inputted, removes them.
+ * @param {HTMLElement} parentDiv POI Div that the section is in.
+ * @param {String} className Name of class corresponding to section to be removed.
+ */
+function removeSection(poiDiv, className) {
+  let childElements = poiDiv.children;
+  for(let i = 0; i < childElements.length; i++) {
+    
+    if(childElements[i].getAttribute("data-corresponding-class") == className) {
+      poiDiv.removeChild(childElements[i]);
+      break;
+    }
+  }
 }
 
 function addInput(dict, key, input, parentSection, counter) {
@@ -195,19 +269,22 @@ function addInput(dict, key, input, parentSection, counter) {
   if (inputType == "input") {
     [field, counter] = createInputField(capitalize(key), options, parentSection, counter, defaultValue);
     field.addEventListener("input", (event) => {
-      input.onChange(dict, key, event.srcElement.value);
+      input.onChange(dict, key, event.srcElement.value, parentSection);
     })
   } else if(inputType == "select" && !options.multiple) {
     [field, counter] = createSelectionField(capitalize(key), options.list, parentSection, counter, defaultValue);
     field.addEventListener("change", (event) => {
-      input.onChange(dict, key, event.srcElement.value);
+      input.onChange(dict, key, event.srcElement.value, parentSection);
     });
   } else if(inputType == "select" && options.multiple) {
-    [field, counter] = CreateSelectionFieldMultiple(capitalize(key), options.list, parentSection, counter, (values) => {
-      input.onChange(dict, key, values)
+    [field, counter] = createSelectionFieldMultiple(capitalize(key), options.list, parentSection, counter, (values) => {
+      input.onChange(dict, key, values, parentSection)
     }, defaultValue);
-    
+  } else if(inputType == "button") {
+    [field, counter] = createButtonField(capitalize(key), options.type, parentSection, counter, input.onClick, options.text);
   }
+
+  input.onCreate(field)
 
   return counter
 }
@@ -231,7 +308,7 @@ function createInputField(input_field_name_str, type, parent, fieldNum, defaultV
     input_field_holder.appendChild(input_field_name);
     input_field_holder.appendChild(input_field);
     parent.appendChild(input_field_holder);
-    return [input_field_holder, fieldNum];
+    return [input_field, fieldNum];
 }
 
 function createSelectionField(select_field_name_str, list, parent, fieldNum, defaultValue=null) {
@@ -246,9 +323,9 @@ function createSelectionField(select_field_name_str, list, parent, fieldNum, def
     let input_field = document.createElement('select');
     input_field.multiple = false;
     // input_field.className += "chosen-select";
-    input_field.id = "poi_type";
-    input_field.name = "type_of_poi";
-    input_field.width = "100px";
+    // input_field.id = "poi_type";
+    // input_field.name = "type_of_poi";
+    // input_field.width = "100px";
     input_field.placeholder = select_field_name_str;
 
     list = list.map((word) => capitalize(word))
@@ -265,10 +342,10 @@ function createSelectionField(select_field_name_str, list, parent, fieldNum, def
     input_field_holder.appendChild(input_field);
     parent.appendChild(input_field_holder);
     // input_field_holder.addEventListener("change", print, false);
-    return [input_field_holder, fieldNum];
+    return [input_field, fieldNum];
 }
 
-function CreateSelectionFieldMultiple(select_field_name_str, list, parent, fieldNum, onChange, defaultValue=null) {
+function createSelectionFieldMultiple(select_field_name_str, list, parent, fieldNum, onChange, defaultValue=null) {
     var selection_field_holder = document.createElement('div');
     selection_field_holder.classList.add("selection_field_holder")
 
@@ -306,28 +383,31 @@ function CreateSelectionFieldMultiple(select_field_name_str, list, parent, field
     selection_field_holder.style.height = total_height;
 
     parent.appendChild(selection_field_holder);
+    // TODO: What do I return here? vvv
     return [selection_field_holder, fieldNum];
 }
 
-function GetSelectValues(select) {
-    var result = [];
-    var options = select && select.options;
-    console.log(options)
-    var opt;
+function createButtonField(input_field_name_str, type, parent, fieldNum, onClick, buttonText="") {
+  let input_field_holder = document.createElement('div');
+  input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
+  input_field_holder.classList.add("input_field_holder");
 
-    for (var i=0, iLen=options.length; i<iLen; i++) {
-        opt = options[i];
+  let input_field_name = document.createElement('span');
+  input_field_name.classList.add("input_field_name")
+  input_field_name.innerHTML = input_field_name_str;
 
-        if (opt.selected) {
-        result.push(opt.value || opt.text);
-        }
-    }
-    console.log(result);
-    return result;
-}
+  let input_field = document.createElement('button');
+  input_field.innerHTML = buttonText;
+  input_field.type = type
 
-function print() {
-    console.log("PRINTING" + this);
+  input_field.addEventListener("click", () => {
+    onClick(parent);
+  })
+
+  input_field_holder.appendChild(input_field_name);
+  input_field_holder.appendChild(input_field);
+  parent.appendChild(input_field_holder);
+  return [input_field, fieldNum];
 }
 
 function saveRoom(poi) {
@@ -346,7 +426,7 @@ function saveRoom(poi) {
 let room = {};
 
 for(let i in [1]) {
-  showPoi(room);
+  addPoi(room);
 }
 
 document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})

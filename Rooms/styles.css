@@ -107,12 +107,12 @@ body, html {
 .input_field_name {
     margin-left: 10px;
 }
-.input_field_holder input, .input_field_holder select {
+.input_field_holder input, .input_field_holder select, .input_field_holder button {
     margin-right: 10px;
     margin-left: auto;
 }
 
-.input_field_holder input {
+.input_field_holder input, .input_field_holder button, .input_field_holder select {
     align-items: center;
     color: black;
     background-color: rgb(224, 224, 224);
@@ -124,4 +124,21 @@ body, html {
     height: 18px;
     width: 18px;
     margin-right: 27%;
+}
+
+.input_field_holder button {
+    height: 20px;
+    width: 20px;
+    text-align: center;
+    line-height: 14px;
+    margin-right: 27%;
+    font-weight: bold;
+}
+
+.input_field_holder button:hover {
+    background-color: darkgray;
+}
+
+.input_field_holder button:active {
+    background-color: gray;
 }
