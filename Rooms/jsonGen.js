@@ -26,89 +26,160 @@ function capitalize(str) {
   return words.join(" ");
 }
 
-function setToValue(dict, key, newValue, sectionDiv) {
-  dict[key] = newValue
-}
-
 let inputTypes = {
-  // TODO: Have to figure out when & when not to autofill the default / previously-entered values
-  // TODO: How are we setting the grayed out background text of text inputs? Can we customize them?
-  text: (def="", onChange=setToValue, fillDefault=false, onCreate=(_) => {}) => 
-    ({default: def, inputType: "input", options: "text", onChange: onChange, fillDefault: fillDefault, onCreate: onCreate}),
-  number: (def, onChange=setToValue, fillDefault=false, onCreate=(_) => {}) => 
-    ({default: def, inputType: "input", options: "number", onChange: onChange, fillDefault: fillDefault, onCreate: onCreate}),
-  select: (def, multiple, items, onChange=setToValue, fillDefault=false, onCreate=(_) => {}) => 
-    ({default: def, inputType: "select", options: {multiple: multiple, list: items}, onChange: onChange, fillDefault: fillDefault, onCreate: onCreate}),
-  button: (text, onClick, onCreate=(_) => {}) => 
-    ({inputType: "button", options: {type: "button", text: text}, onClick: onClick, onCreate: onCreate}),
-  none: (def=undefined, fillDefault=false) => 
-    ({default: def, inputType: "none", fillDefault})
-}
+  getSetToValueFunc: (key) => {
+    return (dict, newValue, sectionDiv) => {
+      dict[key] = newValue
+    }
+  },
+  Text: class Input {
+    constructor(title, def, onChange, fillDefault=false, onCreate=undefined) {
+      this.title = title;
+      this.default = def;
+      this.inputType = "input";
+      this.options = {type: "text"};
+      this.onChange = typeof onChange == "string" ? inputTypes.getSetToValueFunc(onChange) : onChange;
 
-function findPoiSelectorInContainerSection(containerSection) {
-  let children = containerSection.children;
-  for(let i = 0; i < children.length; i++) {
-    if(children[i].classList.contains("input_field_holder")) {
-      let inputFieldChildren = children[i].children;
-      for(let j = 0; j < inputFieldChildren.length; j++) {
-        if(inputFieldChildren[j].classList.contains("poi_selector")) {
-          return inputFieldChildren[j];
-        }
-      }
+      this.fillDefault = fillDefault;
+      this.onCreate = onCreate;
+    }
+  },
+  Number: class Input {
+    constructor(title, def, onChange, fillDefault=false, onCreate=undefined) {
+      this.title = title;
+      this.default = def;
+      this.inputType = "input";
+      this.options = {type: "number"};
+      this.onChange = onChange;
+      this.fillDefault = fillDefault;
+      this.onChange = typeof onChange == "string" ? inputTypes.getSetToValueFunc(onChange) : onChange;
+      this.onCreate = onCreate;
+    }
+  },
+  Select: class Input {
+    constructor(title, def, multiple, items, onChange, fillDefault=false, onCreate=undefined) {
+      this.title = title;
+      this.default = def;
+      this.inputType = "select";
+      this.options = {multiple: multiple, list: items};
+      this.onChange = onChange;
+      this.fillDefault = fillDefault;
+      this.onChange = typeof onChange == "string" ? inputTypes.getSetToValueFunc(onChange) : onChange;
+      this.onCreate = onCreate;
+    }
+  },
+  Button: class Input {
+    constructor(title, text, onClick, onCreate=undefined) {
+      this.title = title;
+      this.inputType = "button";
+      this.options = {type: "button", text: text};
+      this.onClick = onClick;
+      this.onCreate = onCreate;
+    }
+  },
+  None: class Input {
+    constructor(def, fillDefault=false) {
+      this.default = def;
+      this.inputType = "none";
+      this.fillDefault = fillDefault;
+    }
+  },
+  List: class InputList {
+    constructor(def, list, onChange=undefined) {
+      this.default = def;
+      this.list = list;
+      this.onChange = onChange;
     }
   }
 }
 
+
+function findElementInElement(classToFind, parentElement) {
+  if(parentElement.classList.contains(classToFind)) {
+    return parentElement;
+  }
+  let children = parentElement.children;
+
+  for(let i = 0; i < children.length; i++) {
+    let childResult = findElementInElement(classToFind, children[i]);
+    if(childResult != undefined) {
+      return childResult;
+    }
+  }
+
+  return undefined;
+}
+let poiIdCounter = 0;
+let poisById = {};
+
 let classes = {
   poi: {
-      name: inputTypes.text("Poi", (dict, key, newValue, sectionDiv) => {
-        dict[key] = newValue;
+      name: new inputTypes.Text("Name", "Poi", (dict, newValue, sectionDiv) => {
+        dict["name"] = newValue;
         sectionDiv.children[0].innerHTML = newValue;
+        
+        let previousLayer = sectionDiv.parentElement.getAttribute("data-poi-layer") - 1;
+        console.log(previousLayer)
+        if(previousLayer >= 0) {
+          let poiDivs = document.getElementById("main").children;
+          for(let i = 0; i < poiDivs.length; i++) {
+            if(poiDivs[i].getAttribute("data-poi-layer") == previousLayer) {
+              let selector = findElementInElement("poi_selector", poiDivs[i]);
+              selector.options[selector.selectedIndex].innerHTML = newValue;
+            }
+          }
+        }
       }),
-      class: inputTypes.select([], true, ["room", "container", "enemy"], (dict, key, newValue, sectionDiv) => {        
-        dict[key] = newValue;
+      class: new inputTypes.Select("Classes", [], true, ["room", "container", "enemy"], (dict, newValue, sectionDiv) => {        
+        dict["class"] = newValue;
         setSections(dict, sectionDiv.parentElement);
       }),
       descriptions: {
-          main_description: inputTypes.text()
+          main_description: new inputTypes.Text("Main Description", "", "main_desciption")
       }
   },
   room: {
-      id: inputTypes.number("temporary!"),
+      id: new inputTypes.Number("ID (temporary)", 0, "id"),
       descriptions: {
-        door_description: inputTypes.text()
+        door_description: new inputTypes.Text("Door Description", "", "door_description")
       },
-      url: inputTypes.none(),
-      rarity: inputTypes.none()
+      url: new inputTypes.None(""),
+      rarity: new inputTypes.None(0)
   },
   container: {
-      poi: [
-        inputTypes.select([], false, [], (dict, key, newValue, sectionDiv) => {
-          removePoi(1 + sectionDiv.parentElement.getAttribute("data-poi-layer"));
-          addPoi(dict["poi"][newValue])
-        }, undefined, (field) => {console.log(field); field.classList.add("poi_selector")}),
-        inputTypes.button("+", (sectionDiv) => {
-          let selector = findPoiSelectorInContainerSection(sectionDiv);
+      poi: new inputTypes.List([], [
+        new inputTypes.Select("Child Pois", undefined, false, [], (dict, newValue, sectionDiv) => {
+          removePoi(sectionDiv.parentElement.getAttribute("data-poi-layer") + 1);
+          if(newValue != undefined) {
+            addPoi(poisById[newValue], sectionDiv.parentElement.getAttribute("data-poi-layer") + 1)
+          }
+        }, false, (field) => {field.classList.add("poi_selector")}),
+        new inputTypes.Button("", "+", (dict, sectionDiv) => {
+          let selector = findElementInElement("poi_selector", sectionDiv);
           let newOption = document.createElement("option");
-          newOption.value = {};
+
+          newOption.value = poiIdCounter++;
+          poisById[newOption.value] = {}
+          dict["poi"].push(poisById[newOption.value])
+
           selector.appendChild(newOption);
           selector.value = newOption.value;
+          
+          classes.container.poi.list[0].onChange(dict, newOption.value, sectionDiv)
         }),
-        inputTypes.button("-", (sectionDiv) => {
-          let selector = findPoiSelectorInContainerSection(sectionDiv);
-          let children = selector.children;
-          for(let i = 0; i < children.length; i++) {
-            if(selector.value == children[i].value) {
-              selector.removeChild(children[i])
-            }
-          }
+        new inputTypes.Button("", "-", (dict, sectionDiv) => {
+          let selector = findElementInElement("poi_selector", sectionDiv);
+          dict["poi"].splice(dict["poi"].indexOf(selector.value))
+          poisById[selector.value] = undefined;
+          selector.remove(selector.value);
+          classes.container.poi.list[0].onChange(dict, undefined, sectionDiv);
         })
-      ],
-      size: inputTypes.number(0)
+      ]), // , (dict, newValue, sectionDiv) => {classes.container.poi.list[0].onChange(dict, newValue, sectionDiv)}
+      size: new inputTypes.Number("Size", 0, "size")
   },
   enemy: {
     descriptions: {
-      attack_description: inputTypes.text()
+      attack_description: new inputTypes.Text("Attack Description", "", "attack_description")
     }
   }
 }
@@ -120,10 +191,10 @@ var poisOnScreen = 0;
  * calls addSection to add base "poi" section, and again to add sections for each class poi has. 
  * @param {Object} poi The POI to add to screen
  */
-function addPoi(poi) {
+function addPoi(poi, layer) {
     let poiDiv = document.createElement('div');
     poiDiv.classList.add("poi");
-    poiDiv.setAttribute("data-poi-layer", poisOnScreen++)
+    poiDiv.setAttribute("data-poi-layer", layer)
 
     addSection(poi, "poi", poiDiv);
 
@@ -138,7 +209,7 @@ function removePoi(layer) {
   let poiDivs = document.getElementById("main").children;
   for(let i = 0; i < poiDivs.length; i++) {
     if(poiDivs[i].getAttribute("data-poi-layer") == layer) {
-      removePoi(layer + 1)
+      removePoi(layer + 1);
       document.getElementById("main").removeChild(poiDivs[i]);
       break;
     }
@@ -159,7 +230,6 @@ function setSections(poi, parentDiv) {
       }
     }
     if(!classAlreadyHasSection) {
-      console.log("adding", classes[i])
       // For every class being added (because it doesn't have a section but it's in the list of classes):
       addSection(poi, classes[i], parentDiv);
     }
@@ -199,30 +269,54 @@ function addSection(poi, className, parentDiv) {
   header.innerHTML = capitalize(className);
   sectionBase.appendChild(header);
 
-  function callAddInput(dict, key, input, sectionBase, counter) {
-    if(input instanceof Array) {
-      for(let i = 0; i < input.length; i++) {
-        counter = addInput(dict, i == 0 ? key : "", input[i], sectionBase, counter)
+  parentDiv.appendChild(sectionBase);
+
+  /** Calls addInput to create an input field for the given input and dictionary. Can take one or a list of inputs.
+   * This function exists to handle lists of inputs.
+   * @param {*} dict Dictionary to be modified by input.
+   * @param {Input or InputList} input Input or array of inputs to be added to section.
+   * @param {*} sectionBase Class section to add inputs to.
+   * @param {*} counter Counter that counts how many inputs have been added.
+   * @returns Value of counter after adding inputs.
+   */
+  function addInputOrInputList(dict, key, input, sectionBase, counter) {
+    if(input instanceof inputTypes.List) {
+      if(!(key in dict)) {
+        dict[key] = input.default;
+        if(input.onChange != undefined) {
+          input.onChange(dict, dict[key], sectionBase);
+        }
+      }
+      for(let i = 0; i < input.list.length; i++) {
+        let defaultValue = input.list[i].fillDefault ? input.list[i].default : undefined;
+        counter = addInput(dict, input.list[i], sectionBase, counter, defaultValue)
       }
     } else {
-      counter = addInput(dict, key, input, sectionBase, counter)
+      if(!(key in dict)) {
+        dict[key] = input.default;
+        input.onChange(dict, dict[key], sectionBase);
+      }
+      let defaultValue = input.fillDefault ? input.default : undefined;
+      counter = addInput(dict, input, sectionBase, counter, defaultValue)
     }
     return counter
   }
 
   let counter = 0;
   for(let key in classes[className]) {
-    let dict = classes[className][key]
+    // dict is either an Input Object, list of Input Objects or a dictionary of Input Objects
+    let inputOrInputs = classes[className][key]
 
-    if("inputType" in dict || dict instanceof Array) {
-      counter = callAddInput(poi, key, classes[className][key], sectionBase, counter)
+    if("inputType" in inputOrInputs || inputOrInputs instanceof inputTypes.List) {
+      // If the selected input is an input or list of inputs, add it/them to sectionBase by calling addInputOrInputList
+      counter = addInputOrInputList(poi, key, inputOrInputs, sectionBase, counter)
     } else {
       // If the selected element is actually a dict with inputs inside, loop through the dict instead.
-      for(let secondaryKey in dict) {
-        if(!(key in poi)) {
-          poi[key] = {}
-        }
-        counter = callAddInput(poi[key], secondaryKey, dict[secondaryKey], sectionBase, counter)
+      if(!(key in poi)) {
+        poi[key] = {}
+      }
+      for(let secondaryKey in poi[key]) {
+        counter = addInputOrInputList(poi[key], secondaryKey, inputOrInputs[secondaryKey], sectionBase, counter)
       }
     }
 
@@ -231,8 +325,6 @@ function addSection(poi, className, parentDiv) {
     }
 
   }
-
-  parentDiv.appendChild(sectionBase);
 }
 
 /** Removes a section from a POI Div, given a class name.
@@ -251,40 +343,45 @@ function removeSection(poiDiv, className) {
   }
 }
 
-function addInput(dict, key, input, parentSection, counter) {
+/** Ad
+ * 
+ * @param {Object} dict The dictionary containing the value to be modified. 
+ * @param {Object} input The object representing the input to be added. 
+ * @param {HTMLElement} parentSection The class section to add the input to.
+ * @param {Int} counter A counter that goes up by 1 every time an input is added. Used for coloring.
+ * @param {*} defaultValue The value that the input should display when first created. Leave null for nothing.
+ * @returns The new value of counter after input has been added.
+ */
+function addInput(dict, input, parentSection, counter, defaultValue=undefined) {
   let inputType = input.inputType;
   let options = input.options;
+  let title = input.title;
   let field;
 
-  let defaultValue = null;
-  if(!(key in dict)) {
-    dict[key] = input.default;
-    if(input.fillDefault) {
-      defaultValue = input.default;
-    }
-  } else {
-    defaultValue = dict[key];
-  }
-
   if (inputType == "input") {
-    [field, counter] = createInputField(capitalize(key), options, parentSection, counter, defaultValue);
+    [field, counter] = createInputField(title, options, parentSection, counter, defaultValue);
     field.addEventListener("input", (event) => {
-      input.onChange(dict, key, event.srcElement.value, parentSection);
+      input.onChange(dict, event.srcElement.value, parentSection);
     })
   } else if(inputType == "select" && !options.multiple) {
-    [field, counter] = createSelectionField(capitalize(key), options.list, parentSection, counter, defaultValue);
+    [field, counter] = createSelectionField(title, options.list, parentSection, counter, defaultValue);
     field.addEventListener("change", (event) => {
-      input.onChange(dict, key, event.srcElement.value, parentSection);
+      input.onChange(dict, event.srcElement.value, parentSection);
     });
   } else if(inputType == "select" && options.multiple) {
-    [field, counter] = createSelectionFieldMultiple(capitalize(key), options.list, parentSection, counter, (values) => {
-      input.onChange(dict, key, values, parentSection)
+    [field, counter] = createSelectionFieldMultiple(title, options.list, parentSection, counter, (values) => {
+      input.onChange(dict, values, parentSection)
     }, defaultValue);
   } else if(inputType == "button") {
-    [field, counter] = createButtonField(capitalize(key), options.type, parentSection, counter, input.onClick, options.text);
+    [field, counter] = createButtonField(title, options.type, parentSection, counter, options.text);
+    field.addEventListener("click", () => {
+      input.onClick(dict, parentSection);
+    })
   }
 
-  input.onCreate(field)
+  if(input.onCreate != undefined) {
+    input.onCreate(field)
+  }
 
   return counter
 }
@@ -331,6 +428,7 @@ function createSelectionField(select_field_name_str, list, parent, fieldNum, def
     list = list.map((word) => capitalize(word))
     for (let i = 0; i < list.length; i++) {
         let new_option = document.createElement("option");
+        // TODO: change this vvv
         new_option.value = list[i];
         new_option.innerHTML = list[i];
         input_field.appendChild(new_option)
@@ -387,7 +485,7 @@ function createSelectionFieldMultiple(select_field_name_str, list, parent, field
     return [selection_field_holder, fieldNum];
 }
 
-function createButtonField(input_field_name_str, type, parent, fieldNum, onClick, buttonText="") {
+function createButtonField(input_field_name_str, type, parent, fieldNum, buttonText="") {
   let input_field_holder = document.createElement('div');
   input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
   input_field_holder.classList.add("input_field_holder");
@@ -399,10 +497,6 @@ function createButtonField(input_field_name_str, type, parent, fieldNum, onClick
   let input_field = document.createElement('button');
   input_field.innerHTML = buttonText;
   input_field.type = type
-
-  input_field.addEventListener("click", () => {
-    onClick(parent);
-  })
 
   input_field_holder.appendChild(input_field_name);
   input_field_holder.appendChild(input_field);
@@ -448,7 +542,7 @@ function generateID() {
 let room = { };
 
 for(let i in [1]) {
-  addPoi(room);
+  addPoi(room, 0);
 }
 
 document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
