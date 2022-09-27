@@ -1,0 +1,8 @@
+@font-face {
+    font-family: cartoon;
+    src: url(/Imgs/Cartoon.ttf);
+}
+
+h1{
+    font-family: cartoon;
+}
