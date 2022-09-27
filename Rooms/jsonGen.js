@@ -261,6 +261,8 @@ function addSection(poi, className, parentDiv) {
   header.innerHTML = capitalize(className);
   sectionBase.appendChild(header);
 
+  parentDiv.appendChild(sectionBase);
+
   /** Calls addInput to create an input field for the given input and dictionary. Can take one or a list of inputs.
    * This function exists to handle lists of inputs.
    * @param {*} dict Dictionary to be modified by input.
@@ -274,6 +276,8 @@ function addSection(poi, className, parentDiv) {
       for(let i = 0; i < input.length; i++) {
         if(!(key in dict)) {
           dict[key] = input[i].default;
+          // TODO: Uncommenting this crashes everything
+          // input[i].onChange(dict, dict[key], sectionBase)
         }
         let defaultValue = input[i].fillDefault ? input[i].default : undefined;
         counter = addInput(dict, input[i], sectionBase, counter, defaultValue)
@@ -281,6 +285,7 @@ function addSection(poi, className, parentDiv) {
     } else {
       if(!(key in dict)) {
         dict[key] = input.default;
+        input.onChange(dict, dict[key], sectionBase);
       }
       let defaultValue = input.fillDefault ? input.default : undefined;
       counter = addInput(dict, input, sectionBase, counter, defaultValue)
@@ -311,8 +316,6 @@ function addSection(poi, className, parentDiv) {
     }
 
   }
-
-  parentDiv.appendChild(sectionBase);
 }
 
 /** Removes a section from a POI Div, given a class name.
