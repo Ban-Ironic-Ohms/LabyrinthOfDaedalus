@@ -45,7 +45,7 @@ let inputTypes = {
     }
   },
   Number: class Input {
-    constructor(title, def, onChange=this.setToValue, fillDefault=false, onCreate=undefined) {
+    constructor(title, def, onChange, fillDefault=false, onCreate=undefined) {
       this.title = title;
       this.default = def;
       this.inputType = "input";
@@ -84,7 +84,15 @@ let inputTypes = {
       this.fillDefault = fillDefault;
     }
   },
+  List: class InputList {
+    constructor(def, list, onChange=undefined) {
+      this.default = def;
+      this.list = list;
+      this.onChange = onChange;
+    }
+  }
 }
+
 
 function findElementInElement(classToFind, parentElement) {
   if(parentElement.classList.contains(classToFind)) {
@@ -111,13 +119,13 @@ let classes = {
         sectionDiv.children[0].innerHTML = newValue;
         
         let previousLayer = sectionDiv.parentElement.getAttribute("data-poi-layer") - 1;
+        console.log(previousLayer)
         if(previousLayer >= 0) {
-          let poiDivs = sectionDiv.parentElement.parentElement.children;
+          let poiDivs = document.getElementById("main").children;
           for(let i = 0; i < poiDivs.length; i++) {
             if(poiDivs[i].getAttribute("data-poi-layer") == previousLayer) {
               let selector = findElementInElement("poi_selector", poiDivs[i]);
               selector.options[selector.selectedIndex].innerHTML = newValue;
-              console.log(selector.selectedIndex)
             }
           }
         }
@@ -139,13 +147,12 @@ let classes = {
       rarity: new inputTypes.None(0)
   },
   container: {
-      poi: [
-        new inputTypes.Select("Child Pois", [], false, [], (dict, newValue, sectionDiv) => {
-          removePoi(1 + sectionDiv.parentElement.getAttribute("data-poi-layer"));
+      poi: new inputTypes.List([], [
+        new inputTypes.Select("Child Pois", undefined, false, [], (dict, newValue, sectionDiv) => {
+          removePoi(sectionDiv.parentElement.getAttribute("data-poi-layer") + 1);
           if(newValue != undefined) {
-            addPoi(poisById[newValue])
+            addPoi(poisById[newValue], sectionDiv.parentElement.getAttribute("data-poi-layer") + 1)
           }
-          console.log("CHANGED!")
         }, false, (field) => {field.classList.add("poi_selector")}),
         new inputTypes.Button("", "+", (dict, sectionDiv) => {
           let selector = findElementInElement("poi_selector", sectionDiv);
@@ -158,15 +165,16 @@ let classes = {
           selector.appendChild(newOption);
           selector.value = newOption.value;
           
-          classes.container.poi[0].onChange(dict, newOption.value, sectionDiv)
+          classes.container.poi.list[0].onChange(dict, newOption.value, sectionDiv)
         }),
         new inputTypes.Button("", "-", (dict, sectionDiv) => {
           let selector = findElementInElement("poi_selector", sectionDiv);
           dict["poi"].splice(dict["poi"].indexOf(selector.value))
           poisById[selector.value] = undefined;
           selector.remove(selector.value);
+          classes.container.poi.list[0].onChange(dict, undefined, sectionDiv);
         })
-      ],
+      ]), // , (dict, newValue, sectionDiv) => {classes.container.poi.list[0].onChange(dict, newValue, sectionDiv)}
       size: new inputTypes.Number("Size", 0, "size")
   },
   enemy: {
@@ -183,10 +191,10 @@ var poisOnScreen = 0;
  * calls addSection to add base "poi" section, and again to add sections for each class poi has. 
  * @param {Object} poi The POI to add to screen
  */
-function addPoi(poi) {
+function addPoi(poi, layer) {
     let poiDiv = document.createElement('div');
     poiDiv.classList.add("poi");
-    poiDiv.setAttribute("data-poi-layer", poisOnScreen++)
+    poiDiv.setAttribute("data-poi-layer", layer)
 
     addSection(poi, "poi", poiDiv);
 
@@ -266,21 +274,22 @@ function addSection(poi, className, parentDiv) {
   /** Calls addInput to create an input field for the given input and dictionary. Can take one or a list of inputs.
    * This function exists to handle lists of inputs.
    * @param {*} dict Dictionary to be modified by input.
-   * @param {Input or Array of Input} input Input or array of inputs to be added to section.
+   * @param {Input or InputList} input Input or array of inputs to be added to section.
    * @param {*} sectionBase Class section to add inputs to.
    * @param {*} counter Counter that counts how many inputs have been added.
    * @returns Value of counter after adding inputs.
    */
   function addInputOrInputList(dict, key, input, sectionBase, counter) {
-    if(input instanceof Array) {
-      for(let i = 0; i < input.length; i++) {
-        if(!(key in dict)) {
-          dict[key] = input[i].default;
-          // TODO: Uncommenting this crashes everything
-          // input[i].onChange(dict, dict[key], sectionBase)
+    if(input instanceof inputTypes.List) {
+      if(!(key in dict)) {
+        dict[key] = input.default;
+        if(input.onChange != undefined) {
+          input.onChange(dict, dict[key], sectionBase);
         }
-        let defaultValue = input[i].fillDefault ? input[i].default : undefined;
-        counter = addInput(dict, input[i], sectionBase, counter, defaultValue)
+      }
+      for(let i = 0; i < input.list.length; i++) {
+        let defaultValue = input.list[i].fillDefault ? input.list[i].default : undefined;
+        counter = addInput(dict, input.list[i], sectionBase, counter, defaultValue)
       }
     } else {
       if(!(key in dict)) {
@@ -298,7 +307,7 @@ function addSection(poi, className, parentDiv) {
     // dict is either an Input Object, list of Input Objects or a dictionary of Input Objects
     let inputOrInputs = classes[className][key]
 
-    if("inputType" in inputOrInputs || inputOrInputs instanceof Array) {
+    if("inputType" in inputOrInputs || inputOrInputs instanceof inputTypes.List) {
       // If the selected input is an input or list of inputs, add it/them to sectionBase by calling addInputOrInputList
       counter = addInputOrInputList(poi, key, inputOrInputs, sectionBase, counter)
     } else {
@@ -533,7 +542,7 @@ function generateID() {
 let room = { };
 
 for(let i in [1]) {
-  addPoi(room);
+  addPoi(room, 0);
 }
 
 document.getElementById("set_room").addEventListener("click", function () {saveRoom(room)})
