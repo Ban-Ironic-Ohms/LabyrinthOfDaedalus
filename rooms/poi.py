@@ -18,15 +18,6 @@ if TYPE_CHECKING:
 # They will live in the parent for each, so just use 
 # super().load_room()        super().load_user()
 # super().save_room()        super().save_user()
-"""
-def load_file(file_name: str) -> dict:
-    with open(file_name, "r") as f:
-        return json.load(f)
-
-def write_to_file(file_name: str, data: dict):
-    with open(file_name, "w") as f:
-        return json.dump(data, f)
-"""
     
 class Descriptions:
     DEFAULT = "unimplemented description"

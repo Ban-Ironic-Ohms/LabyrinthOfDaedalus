@@ -2,28 +2,27 @@ from rooms.poi import Room
 from player.player import Player
 from firebase.firebase_interface import Firebase
 
-# def new_input(message):
-
 def input_handler(current_poi, player: Player, message: str = "> "):
-    input_command = input(message)
+    # input_command = input(message)
+    input_command = "waterfall"
     input_command = input_command.lower()
 
     # misc commands
     if input_command == "help":
-        print("available commands: ")
-        print(" - exit")
-        print(" - help")
-        print(" - inspect")
-        print(" - inventory")
-        print(" - door #")
+        yield("available commands: ")
+        yield(" - exit")
+        yield(" - help")
+        yield(" - inspect")
+        yield(" - inventory")
+        yield(" - door #")
         input_handler(current_poi, player)
 
     elif input_command == "exit":
         exit()
 
-    # this needs to be changed to print just the visible items - not sure what fnc to use
+    # this needs to be changed to yield just the visible items - not sure what fnc to use
     elif input_command in ["inspect", "info", "look"]:
-        current_poi.print_visible()
+        current_poi.yield_visible()
 
     elif input_command in [child_poi.name for child_poi in current_poi.child_pois]:
         for child_poi in current_poi.child_pois:
@@ -40,11 +39,11 @@ def input_handler(current_poi, player: Player, message: str = "> "):
                 player.approach(Room(door.id))
 
     elif input_command in current_poi.child_pois:
-        print(current_poi.child_pois[input_command].description)
+        yield(current_poi.child_pois[input_command].description)
         input_handler(current_poi.child_pois[input_command], player)
 
     else:
-        print("Invalid command - Type help for valid commands")
+        yield("Invalid command - Type help for valid commands")
         return input_command
 
 def main():
@@ -60,6 +59,3 @@ def main():
 
     # main_room.save_data_to_database()
 
-
-if __name__ == "__main__":
-    main()
