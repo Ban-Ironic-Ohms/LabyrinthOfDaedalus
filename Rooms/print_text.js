@@ -1,0 +1,31 @@
+var test_str = "According to all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway. Because bees do not care what humans think is imposible!";
+var tstr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dictumst quisque sagittis purus sit amet volutpat consequat mauris. Nibh cras pulvinar mattis nunc. Sagittis purus sit amet volutpat. Aliquet porttitor lacus luctus accumsan tortor posuere ac ut. Pellentesque adipiscing commodo elit at imperdiet. Vitae elementum curabitur vitae nunc sed. Vitae proin sagittis nisl rhoncus. Libero nunc consequat interdum varius sit amet mattis vulputate enim. Velit egestas dui id ornare arcu odio ut. Natoque penatibus et magnis dis parturient montes. Nec sagittis aliquam malesuada bibendum arcu vitae elementum curabitur vitae. Egestas dui id ornare arcu odio ut sem nulla. Maecenas accumsan lacus vel facilisis volutpat est. Sollicitudin aliquam ultrices sagittis orci a scelerisque purus semper. Neque convallis a cras semper auctor neque vitae tempus quam. Nisi vitae suscipit tellus mauris. Morbi tristique senectus et netus. Tellus cras adipiscing enim eu turpis egestas pretium. Etiam tempor orci eu lobortis elementum nibh. Pellentesque id nibh tortor id aliquet. Magna ac placerat vestibulum lectus mauris ultrices. Auctor augue mauris augue neque gravida in fermentum et. Diam maecenas sed enim ut sem viverra aliquet. Congue eu consequat ac felis donec et odio pellentesque. Arcu cursus euismod quis viverra nibh cras pulvinar. Erat pellentesque adipiscing commodo elit at. Quis enim lobortis scelerisque fermentum dui faucibus in ornare quam. Massa enim nec dui nunc mattis enim. Nulla facilisi nullam vehicula ipsum a arcu. Eget aliquet nibh praesent tristique. Arcu cursus euismod quis viverra. Placerat duis ultricies lacus sed turpis tincidunt id aliquet risus. Massa sed elementum tempus egestas sed sed risus pretium. Felis eget velit aliquet sagittis id. Proin sagittis nisl rhoncus mattis rhoncus urna neque. Pretium aenean pharetra magna ac placerat vestibulum. Tellus pellentesque eu tincidunt tortor aliquam nulla facilisi cras fermentum. Non tellus orci ac auctor augue mauris. Lectus urna duis convallis convallis tellus id interdum velit laoreet. Quam nulla porttitor massa id neque. Leo integer malesuada nunc vel risus commodo. Porta non pulvinar neque laoreet suspendisse interdum consectetur. Etiam erat velit scelerisque in dictum non consectetur a erat. Fringilla ut morbi tincidunt augue interdum velit euismod. Eleifend mi in nulla posuere sollicitudin aliquam. Aliquam eleifend mi in nulla. Risus nullam eget felis eget nunc lobortis mattis aliquam. Enim diam vulputate ut pharetra sit amet. Vel fringilla est ullamcorper eget. Egestas erat imperdiet sed euismod nisi. Sed adipiscing diam donec adipiscing tristique risus nec feugiat. Nibh sit amet commodo nulla facilisi nullam vehicula ipsum. Mi in nulla posuere sollicitudin. Eget mauris pharetra et ultrices neque. Dui vivamus arcu felis bibendum ut tristique. Malesuada nunc vel risus commodo viverra maecenas accumsan lacus. Fames ac turpis egestas integer eget. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Amet tellus cras adipiscing enim eu turpis egestas pretium. Praesent elementum facilisis leo vel fringilla est ullamcorper eget nulla. Eget velit aliquet sagittis id consectetur. Nisl suscipit adipiscing bibendum est ultricies integer quis auctor elit. Diam in arcu cursus euismod quis viverra nibh. Bibendum ut tristique et egestas quis. Eu nisl nunc mi ipsum faucibus vitae aliquet nec. Vel risus commodo viverra maecenas accumsan lacus vel facilisis volutpat. Ut faucibus pulvinar elementum integer enim neque volutpat ac tincidunt. A scelerisque purus semper eget duis at tellus at. Netus et malesuada fames ac turpis. Eget felis eget nunc lobortis mattis aliquam faucibus. Sit amet nisl suscipit adipiscing bibendum est ultricies. Morbi quis commodo odio aenean sed. Faucibus ornare suspendisse sed nisi lacus sed viverra tellus. Augue interdum velit euismod in pellentesque massa placerat duis ultricies. Sit amet nisl suscipit adipiscing bibendum est. Fermentum dui faucibus in ornare quam viverra orci sagittis eu. Feugiat vivamus at augue eget arcu. Eget nunc scelerisque viverra mauris in aliquam sem fringilla. Arcu cursus vitae congue mauris rhoncus aenean vel. Convallis posuere morbi leo urna molestie at elementum. Vulputate dignissim suspendisse in est ante in nibh. Vitae congue eu consequat ac felis. Sagittis nisl rhoncus mattis rhoncus urna neque viverra justo nec. In hendrerit gravida rutrum quisque non tellus orci. Nisi vitae suscipit tellus mauris a diam. Scelerisque fermentum dui faucibus in. Feugiat vivamus at augue eget arcu dictum varius duis at. Enim sed faucibus turpis in eu mi bibendum. Erat velit scelerisque in dictum. Neque gravida in fermentum et sollicitudin. Risus viverra adipiscing at in tellus integer feugiat scelerisque. Faucibus nisl tincidunt eget nullam non nisi est sit. Felis bibendum ut tristique et egestas. Consequat mauris nunc congue nisi vitae suscipit tellus. Rutrum quisque non tellus orci ac auctor. Rhoncus dolor purus non enim praesent elementum facilisis. In dictum non consectetur a erat nam at lectus urna. Orci a scelerisque purus semper eget duis at. Sed euismod nisi porta lorem mollis aliquam ut porttitor leo.";
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+ }
+ async function print_str(str) {
+    for (let i = 0; i <str.length ; i++) {        
+       await sleep(205);
+       document.querySelector('#text').innerHTML += str[i];
+    }
+ }
+ print_str(test_str)
+
+
+// function sleep(milliseconds) {
+//     const date = Date.now();
+//     let currentDate = null;
+//     do {
+//       currentDate = Date.now();
+//     } while (currentDate - date < milliseconds);
+//   }
+
+// async function print_str(str) {
+//     for (let i = 0; i < str.length; i++) {
+//         document.querySelector( #text ).innerHTML += str[i];
+//         await sleep(10);
+//     }
+// }
+
+// print_str(test_str);

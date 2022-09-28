@@ -1,6 +1,11 @@
 firebase/firebase-keys.json
 __pycache__
 .idea
-Rooms\__pycache__
-.gitignore
-node_modules
+rooms/__pycache__
+Rooms/__pycache__
+firebase/__pycache__
+player/__pycache__
+__pycache__
+firebase-keys.json
+# /node_modules
+/bower_components
