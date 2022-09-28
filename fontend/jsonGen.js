@@ -33,11 +33,11 @@ let inputTypes = {
     }
   },
   Text: class Input {
-    constructor(title, def, onChange, fillDefault=false, onCreate=undefined) {
+    constructor(title, def, onChange, maxCharacters=undefined, fillDefault=false, onCreate=undefined) {
       this.title = title;
       this.default = def;
       this.inputType = "input";
-      this.options = {type: "text"};
+      this.options = {type: "text", maxCharacters: maxCharacters};
       this.onChange = typeof onChange == "string" ? inputTypes.getSetToValueFunc(onChange) : onChange;
 
       this.fillDefault = fillDefault;
@@ -45,11 +45,11 @@ let inputTypes = {
     }
   },
   Number: class Input {
-    constructor(title, def, onChange, fillDefault=false, onCreate=undefined) {
+    constructor(title, def, onChange, minNum=undefined, maxNum=undefined, fillDefault=false, onCreate=undefined) {
       this.title = title;
       this.default = def;
       this.inputType = "input";
-      this.options = {type: "number"};
+      this.options = {type: "number", minNum: minNum, maxNum: maxNum};
       this.onChange = onChange;
       this.fillDefault = fillDefault;
       this.onChange = typeof onChange == "string" ? inputTypes.getSetToValueFunc(onChange) : onChange;
@@ -111,6 +111,7 @@ function findElementInElement(classToFind, parentElement) {
 }
 let poiIdCounter = 0;
 let poisById = {};
+let descriptionMaxLen = 200;
 
 let classes = {
   poi: {
@@ -118,8 +119,7 @@ let classes = {
         dict["name"] = newValue;
         sectionDiv.children[0].innerHTML = newValue;
         
-        let previousLayer = sectionDiv.parentElement.getAttribute("data-poi-layer") - 1;
-        console.log(previousLayer)
+        let previousLayer = parseInt(sectionDiv.parentElement.getAttribute("data-poi-layer")) - 1;
         if(previousLayer >= 0) {
           let poiDivs = document.getElementById("main").children;
           for(let i = 0; i < poiDivs.length; i++) {
@@ -129,19 +129,19 @@ let classes = {
             }
           }
         }
-      }),
+      }, 20),
       class: new inputTypes.Select("Classes", [], true, ["room", "container", "enemy"], (dict, newValue, sectionDiv) => {        
         dict["class"] = newValue;
         setSections(dict, sectionDiv.parentElement);
       }),
       descriptions: {
-          main_description: new inputTypes.Text("Main Description", "", "main_desciption")
+          main_description: new inputTypes.Text("Main Description", "", "main_desciption", descriptionMaxLen)
       }
   },
   room: {
-      id: new inputTypes.Number("ID (temporary)", 0, "id"),
+      id: new inputTypes.Number("ID (temporary)", 0, "id", 0, 1000000000000),
       descriptions: {
-        door_description: new inputTypes.Text("Door Description", "", "door_description")
+        doorDescription: new inputTypes.Text("Door Description", "", "door_description", descriptionMaxLen)
       },
       url: new inputTypes.None(""),
       rarity: new inputTypes.None(0)
@@ -149,9 +149,10 @@ let classes = {
   container: {
       poi: new inputTypes.List([], [
         new inputTypes.Select("Child Pois", undefined, false, [], (dict, newValue, sectionDiv) => {
-          removePoi(sectionDiv.parentElement.getAttribute("data-poi-layer") + 1);
+          let nextLayer = parseInt(sectionDiv.parentElement.getAttribute("data-poi-layer")) + 1
+          removePoi(nextLayer);
           if(newValue != undefined) {
-            addPoi(poisById[newValue], sectionDiv.parentElement.getAttribute("data-poi-layer") + 1)
+            addPoi(poisById[newValue], nextLayer)
           }
         }, false, (field) => {field.classList.add("poi_selector")}),
         new inputTypes.Button("", "+", (dict, sectionDiv) => {
@@ -175,16 +176,14 @@ let classes = {
           classes.container.poi.list[0].onChange(dict, undefined, sectionDiv);
         })
       ]), // , (dict, newValue, sectionDiv) => {classes.container.poi.list[0].onChange(dict, newValue, sectionDiv)}
-      size: new inputTypes.Number("Size", 0, "size")
+      size: new inputTypes.Number("Size", 0, "size", 0, 10000000000)
   },
   enemy: {
     descriptions: {
-      attack_description: new inputTypes.Text("Attack Description", "", "attack_description")
+      attackDescription: new inputTypes.Text("Attack Description", "", "attack_description", descriptionMaxLen)
     }
   }
 }
-
-var poisOnScreen = 0;
 
 /** Adds a new column to the screen representing a POI.
  * Creates and adds div with class "poi" that is background of column, 
@@ -386,122 +385,121 @@ function addInput(dict, input, parentSection, counter, defaultValue=undefined) {
   return counter
 }
 
-function createInputField(input_field_name_str, type, parent, fieldNum, defaultValue=null) {
-    let input_field_holder = document.createElement('div');
-    input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
-    input_field_holder.classList.add("input_field_holder");
+function createInputField(inputFieldNameStr, options, parent, fieldNum, defaultValue=null) {
+    let inputFieldHolder = document.createElement('div');
+    inputFieldHolder.classList.add(fieldNum++ % 2 ? "odd" : "even")
+    inputFieldHolder.classList.add("input_field_holder");
 
-    let input_field_name = document.createElement('span');
-    input_field_name.classList.add("input_field_name")
-    input_field_name.innerHTML = input_field_name_str;
+    let inputFieldName = document.createElement('span');
+    inputFieldName.classList.add("input_field_name")
+    inputFieldName.innerHTML = inputFieldNameStr;
 
-    let input_field = document.createElement('input');
-    input_field.placeholder = input_field_name_str;
-    input_field.type = type
+    let inputField = document.createElement('input');
+    inputField.placeholder = inputFieldNameStr;
+    inputField.type = options.type
     if(defaultValue != null) {
-      input_field.value = defaultValue;
+      inputField.value = defaultValue;
     }
+    if(options.maxCharacters != undefined) inputField.maxLength = options.maxCharacters;
+    if(options.minNum != undefined) inputField.min = options.minNum;
+    if(options.maxNum != undefined) inputField.max = options.maxNum;
 
-    input_field_holder.appendChild(input_field_name);
-    input_field_holder.appendChild(input_field);
-    parent.appendChild(input_field_holder);
-    return [input_field, fieldNum];
+    inputFieldHolder.appendChild(inputFieldName);
+    inputFieldHolder.appendChild(inputField);
+    parent.appendChild(inputFieldHolder);
+    return [inputField, fieldNum];
 }
 
-function createSelectionField(select_field_name_str, list, parent, fieldNum, defaultValue=null) {
-    let input_field_holder = document.createElement('div');
-    input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
-    input_field_holder.classList.add("input_field_holder")
+function createSelectionField(selectFieldNameStr, list, parent, fieldNum, defaultValue=null) {
+    let inputFieldHolder = document.createElement('div');
+    inputFieldHolder.classList.add(fieldNum++ % 2 ? "odd" : "even")
+    inputFieldHolder.classList.add("input_field_holder")
 
-    let input_field_name = document.createElement('span');
-    input_field_name.classList.add("input_field_name")
-    input_field_name.innerHTML = select_field_name_str;
+    let inputFieldName = document.createElement('span');
+    inputFieldName.classList.add("input_field_name")
+    inputFieldName.innerHTML = selectFieldNameStr;
 
-    let input_field = document.createElement('select');
-    input_field.multiple = false;
-    // input_field.className += "chosen-select";
-    // input_field.id = "poi_type";
-    // input_field.name = "type_of_poi";
-    // input_field.width = "100px";
-    input_field.placeholder = select_field_name_str;
+    let inputField = document.createElement('select');
+    inputField.multiple = false;
+    inputField.placeholder = selectFieldNameStr;
 
     list = list.map((word) => capitalize(word))
     for (let i = 0; i < list.length; i++) {
-        let new_option = document.createElement("option");
+        let newOption = document.createElement("option");
         // TODO: change this vvv
-        new_option.value = list[i];
-        new_option.innerHTML = list[i];
-        input_field.appendChild(new_option)
+        newOption.value = list[i];
+        newOption.innerHTML = list[i];
+        inputField.appendChild(newOption)
     }
 
-    input_field.value = defaultValue;
+    inputField.value = defaultValue;
 
-    input_field_holder.appendChild(input_field_name);
-    input_field_holder.appendChild(input_field);
-    parent.appendChild(input_field_holder);
-    // input_field_holder.addEventListener("change", print, false);
-    return [input_field, fieldNum];
+    inputFieldHolder.appendChild(inputFieldName);
+    inputFieldHolder.appendChild(inputField);
+    parent.appendChild(inputFieldHolder);
+    return [inputField, fieldNum];
 }
 
-function createSelectionFieldMultiple(select_field_name_str, list, parent, fieldNum, onChange, defaultValue=null) {
-    var selection_field_holder = document.createElement('div');
-    selection_field_holder.classList.add("selection_field_holder")
+function createSelectionFieldMultiple(selectFieldNameStr, list, parent, fieldNum, onChange, defaultValue=null) {
+  // TODO: Default value not implemented
+  var selectionFieldHolder = document.createElement('div');
+  selectionFieldHolder.classList.add("selection_field_holder")
 
-    var name_field_holder = document.createElement("div")
-    name_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
-    name_field_holder.classList.add("name_field_holder")
-    selection_field_holder.appendChild(name_field_holder)
+  var nameFieldHolder = document.createElement("div")
+  nameFieldHolder.classList.add(fieldNum++ % 2 ? "odd" : "even")
+  nameFieldHolder.classList.add("name_field_holder")
+  selectionFieldHolder.appendChild(nameFieldHolder)
 
-    var input_field_name = document.createElement('span');
-    input_field_name.classList.add("input_field_name")
-    input_field_name.innerHTML = capitalize(select_field_name_str);
-    name_field_holder.appendChild(input_field_name);
+  var inputFieldName = document.createElement('span');
+  inputFieldName.classList.add("input_field_name")
+  inputFieldName.innerHTML = capitalize(selectFieldNameStr);
+  nameFieldHolder.appendChild(inputFieldName);
 
-    var fields = [];
+  var fields = [];
 
-    var selectedItems = []
-    for (let i = 0; i < list.length; i++) {
-        [fields[i], fieldNum] = (createInputField("&nbsp⦿ " + capitalize(list[i]), "checkbox", selection_field_holder, fieldNum));
-        fields[i].addEventListener("change", (event) => {
-          if(event.srcElement.checked) {
-            selectedItems.push(list[i]);
-          } else {
-            selectedItems.splice(selectedItems.indexOf(list[i]), 1);
-          }
-          onChange(selectedItems);
-        })
-    }
+  var selectedItems = []
+  for (let i = 0; i < list.length; i++) {
+      [fields[i], fieldNum] = (createInputField("&nbsp⦿ " + capitalize(list[i]), {type: "checkbox"}, selectionFieldHolder, fieldNum));
+      fields[i].addEventListener("change", (event) => {
+        if(event.srcElement.checked) {
+          selectedItems.push(list[i]);
+        } else {
+          selectedItems.splice(selectedItems.indexOf(list[i]), 1);
+        }
+        onChange(selectedItems);
+      })
+  }
 
-    let total_height = 10;
+  let totalHeight = 10;
 
-    for (let i = 0; i < fields.length; i++) {
-        total_height += fields[i].style.height;
-    }
+  for (let i = 0; i < fields.length; i++) {
+      totalHeight += fields[i].style.height;
+  }
 
-    selection_field_holder.style.height = total_height;
+  selectionFieldHolder.style.height = totalHeight;
 
-    parent.appendChild(selection_field_holder);
-    // TODO: What do I return here? vvv
-    return [selection_field_holder, fieldNum];
+  parent.appendChild(selectionFieldHolder);
+  // TODO: What do I return here? vvv
+  return [selectionFieldHolder, fieldNum];
 }
 
-function createButtonField(input_field_name_str, type, parent, fieldNum, buttonText="") {
-  let input_field_holder = document.createElement('div');
-  input_field_holder.classList.add(fieldNum++ % 2 ? "odd" : "even")
-  input_field_holder.classList.add("input_field_holder");
+function createButtonField(inputFieldNameStr, type, parent, fieldNum, buttonText="") {
+  let inputFieldHolder = document.createElement('div');
+  inputFieldHolder.classList.add(fieldNum++ % 2 ? "odd" : "even")
+  inputFieldHolder.classList.add("input_field_holder");
 
-  let input_field_name = document.createElement('span');
-  input_field_name.classList.add("input_field_name")
-  input_field_name.innerHTML = input_field_name_str;
+  let inputFieldName = document.createElement('span');
+  inputFieldName.classList.add("input_field_name")
+  inputFieldName.innerHTML = inputFieldNameStr;
 
-  let input_field = document.createElement('button');
-  input_field.innerHTML = buttonText;
-  input_field.type = type
+  let inputField = document.createElement('button');
+  inputField.innerHTML = buttonText;
+  inputField.type = type
 
-  input_field_holder.appendChild(input_field_name);
-  input_field_holder.appendChild(input_field);
-  parent.appendChild(input_field_holder);
-  return [input_field, fieldNum];
+  inputFieldHolder.appendChild(inputFieldName);
+  inputFieldHolder.appendChild(inputField);
+  parent.appendChild(inputFieldHolder);
+  return [inputField, fieldNum];
 }
 
 function saveRoom(poi) {
@@ -510,17 +508,16 @@ function saveRoom(poi) {
   // When saving room, trim any variables in poi that don't correspond to any classes on poi
   // Also, we should probably calculate stuff like rarity and id here, right?
 
-  console.log(poi);
 
   poi.id = generateID();
-  console.log(poi.id);
-  const room_ref = ref(database, '/rooms/' + poi.id);
-  onValue(room_ref, (snapshot) => {
+  console.log("Saving:", poi, "with ID:", poi.id);
+  const roomRef = ref(database, '/rooms/' + poi.id);
+  onValue(roomRef, (snapshot) => {
     if ( snapshot.val() != null ) {
       console.log("Room with that ID already exists - you just expirenced a one-in-2.27-thousand-quintillion-quintillion-quintillion chance. And yes, I wrote a case for it");
       saveRoom(poi);
     } else {
-      set(room_ref, poi);
+      set(roomRef, poi);
     }
   }, {
     onlyOnce: true
