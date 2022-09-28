@@ -1,5 +1,8 @@
+firebase/firebase-keys.json
+__pycache__
 .idea
 rooms/__pycache__
+Rooms/__pycache__
 firebase/__pycache__
 player/__pycache__
 __pycache__

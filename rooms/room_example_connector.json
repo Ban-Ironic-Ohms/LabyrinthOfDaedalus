@@ -2,7 +2,9 @@
     "name": "desert",
     "id": "00000000000000000000000000000002",
     "value": 2,
-    "class": ["room"],
+    "class": [
+        "room"
+    ],
     "url": "https://example.com/room/00000000000000000000000000000002",
     "descriptions": {
         "main_description": "a vast desert with a single palm tree",
@@ -10,66 +12,78 @@
     },
     "doors": {
         "door 1": {
+            "name": "back to reality",
+            "id": "00000000000000000000000000000001",
             "url": "https://example.com/door/00000000000000000000000000000001",
             "file_name": "room_example"
         }
     },
-    "entities": {
-
-    },
-    "poi": {
-        "dune": {
+    "entities": {},
+    "poi": [
+        {
             "name": "dune",
             "descriptions": {
                 "main_description": "a sand dune with some sand and sand"
             },
-            "class": ["container"],
-            "poi": {
-                "sack": {
+            "class": [
+                "container"
+            ],
+            "poi": [
+                {
                     "name": "cloth sack",
                     "descriptions": {
                         "main_description": "a small cloth sack tied shut"
                     },
-                    "class": ["container"],
-                    "poi": {
-                        "key": {
+                    "class": [
+                        "container"
+                    ],
+                    "poi": [
+                        {
                             "name": "Brass Key",
                             "descriptions": {
                                 "main_description": "a large rusty brass key"
                             },
-                            "class": ["collectable"],
+                            "class": [
+                                "collectable"
+                            ],
                             "rarity": 3
                         },
-                        "gold": {
+                        {
                             "name": "A single peice of gold",
                             "descriptions": {
                                 "main_description": "one gold peice"
                             },
-                            "class": ["collectable"],
+                            "class": [
+                                "collectable"
+                            ],
                             "rarity": 2,
                             "value": 1
                         },
-                        "dagger": {
+                        {
                             "name": "gold dagger",
                             "descriptions": {
                                 "main_description": "a small gold dagger with jewel inlay"
                             },
-                            "class": ["collectable"],
+                            "class": [
+                                "collectable"
+                            ],
                             "rarity": 13,
                             "value": 25
                         }
-                    }
+                    ]
                 }
-            }
+            ]
         },
-        "potion": {
+        {
             "name": "healing potion",
             "descriptions": {
                 "main_description": "a potion of healing"
             },
-            "class": ["collectable"],
+            "class": [
+                "collectable"
+            ],
             "rarity": 9,
             "effect": "heal"
         }
-    }
+    ]
 }
