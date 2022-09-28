@@ -9,3 +9,4 @@ __pycache__
 firebase-keys.json
 # /node_modules
 /bower_components
+django-tests/LabyrinthOfDaedalus/LabyrinthOfDaedalus/settings.py
