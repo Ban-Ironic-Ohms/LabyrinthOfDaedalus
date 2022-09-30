@@ -6,7 +6,7 @@ import io, os, subprocess, sys
 # sys.path.append("../../")
 sys.path.append("/home/micah/Documents/LabyrinthOfDaedalus/")
 from main_copy import main
-main()
+# main()
 
 # main()
 # a = subprocess.run(["python3", "/home/micah/Documents/LabyrinthOfDaedalus/main.py"], capture_output=True)
@@ -24,7 +24,15 @@ def home(request):
     out = ""
     for i in main():
         # print(i)
-        out += i
+        out += str(i)
+        out += "\n"
+        # specialRender(request, out)
+        render(request, "home.html", {"response": out})
+        print("out")
+        
+    return specialRender(request, out)
+
+def specialRender(request, out):
     
     return render(request, "home.html", {"response": out})
 

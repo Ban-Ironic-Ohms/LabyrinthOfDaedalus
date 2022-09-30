@@ -1,3 +1,4 @@
+import time
 from rooms.poi import Room
 from player.player import Player
 from firebase.firebase_interface import Firebase
@@ -47,15 +48,25 @@ def input_handler(current_poi, player: Player, message: str = "> "):
         return input_command
 
 def main():
-    base_rooms = ["room_example.json", "room_example_connector.json"]
-    base_players = ["player_data.json"]
-    database = Firebase(base_rooms=base_rooms, base_players=base_players, reset=True)
+    
+    for i in range(100):
+        yield i
+        
+    time.sleep(2)
+    
+    for i in range(100):
+        yield i
+        
+    
+    # base_rooms = ["room_example.json", "room_example_connector.json"]
+    # base_players = ["player_data.json"]
+    # database = Firebase(base_rooms=base_rooms, base_players=base_players, reset=True)
 
-    main_room = Room(Room.load_data_from_database(database, "00000000000000000000000000000001"), database)
+    # main_room = Room(Room.load_data_from_database(database, "00000000000000000000000000000001"), database)
 
-    player = Player(Player.load_data_from_database(database, "0000000000000000"), database)
+    # player = Player(Player.load_data_from_database(database, "0000000000000000"), database)
 
-    player.approach(main_room, input_handler)
+    # player.approach(main_room, input_handler)
 
-    # main_room.save_data_to_database()
+    # # main_room.save_data_to_database()
 
