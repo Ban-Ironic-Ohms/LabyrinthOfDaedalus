@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from helper_functions import article
+from helper_functions import article, pre_print
 
 if TYPE_CHECKING:
     from firebase.firebase_interface import Firebase
@@ -79,28 +79,28 @@ class Player:
     def add_to_inventory(self, item: Poi):
         # check if you can take target item
         if "item" not in item.cls:
-            print(f"You can't put {article(item.name)} {item.name} in your inventory!")
+            pre_print(f"You can't put {article(item.name)} {item.name} in your inventory!")
             return None
 
         # tell player they got the item
-        print(f"You have acquired {article(item.name)} {item.name}")
+        pre_print(f"You have acquired {article(item.name)} {item.name}")
 
         # add to inventory
         self.inventory.append(item.data)
 
     def attack_enemy(self, enemy: Enemy):
-        print(self.descriptions.attack)
+        pre_print(self.descriptions.attack)
         old_enemy_hp = enemy.hp
         enemy.hp -= self.dmg
         # enemy.save_data_to_database()
-        print(f"You hit and deal {self.dmg} to the {enemy.name}.")
-        print(f"It has {enemy.hp} hp left. ({old_enemy_hp} - {self.dmg})")
+        pre_print(f"You hit and deal {self.dmg} to the {enemy.name}.")
+        pre_print(f"It has {enemy.hp} hp left. ({old_enemy_hp} - {self.dmg})")
 
     def approach(self, target: Poi, input_handler):
         # if isinstance(target, Room):  # If you ever need to check what type of POI target is, feel free but talk to me after -owen
         target.print_doors()
 
-        print(f"You approach {article(target.name)} {target.name}")
+        pre_print(f"You approach {article(target.name)} {target.name}")
         target.print_visible()
 
         if len(target.child_pois) > 0:

@@ -1,8 +1,8 @@
 from rooms.poi import Room
 from player.player import Player
 from firebase.firebase_interface import Firebase
+from helper_functions import pre_print
 
-# def new_input(message):
 
 def input_handler(current_poi, player: Player, message: str = "> "):
     input_command = input(message)
@@ -10,20 +10,20 @@ def input_handler(current_poi, player: Player, message: str = "> "):
 
     # misc commands
     if input_command == "help":
-        print("available commands: ")
-        print(" - exit")
-        print(" - help")
-        print(" - inspect")
-        print(" - inventory")
-        print(" - door #")
+        pre_print("available commands: ")
+        pre_print(" - exit")
+        pre_print(" - help")
+        pre_print(" - inspect")
+        pre_print(" - inventory")
+        pre_print(" - door #")
         input_handler(current_poi, player)
 
     elif input_command == "exit":
         exit()
 
-    # this needs to be changed to print just the visible items - not sure what fnc to use
+    # this needs to be changed to pre_print just the visible items - not sure what fnc to use
     elif input_command in ["inspect", "info", "look"]:
-        current_poi.print_visible()
+        current_poi.pre_print_visible()
 
     elif input_command in [child_poi.name for child_poi in current_poi.child_pois]:
         for child_poi in current_poi.child_pois:
@@ -40,11 +40,11 @@ def input_handler(current_poi, player: Player, message: str = "> "):
                 player.approach(Room(door.id))
 
     elif input_command in current_poi.child_pois:
-        print(current_poi.child_pois[input_command].description)
+        pre_print(current_poi.child_pois[input_command].description)
         input_handler(current_poi.child_pois[input_command], player)
 
     else:
-        print("Invalid command - Type help for valid commands")
+        pre_print("Invalid command - Type help for valid commands")
         return input_command
 
 def main():
@@ -62,4 +62,5 @@ def main():
 
 
 if __name__ == "__main__":
+    Firebase.reset_message()
     main()

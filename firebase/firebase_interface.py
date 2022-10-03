@@ -1,9 +1,11 @@
 # Thanks to github.com/mdrkb for this template. I could not find documentation for this
+import re
 from xml.dom import ValidationErr
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 import json
+import random
 
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('firebase/firebase-keys.json')
@@ -86,3 +88,22 @@ class Firebase:
     def get_player(player_id):
         ref = db.reference('/users/' + str(player_id))
         return ref.get()
+
+    def new_message(message, newline):
+        ref = db.reference('/message/')
+        current = ref.get()
+        if current == None:
+            ref.set(message)
+            return
+        if newline:
+            current += "<br>"
+            current += message
+        else:
+            current += message
+        ref.set(current)
+        return
+    
+    def reset_message():
+        ref = db.reference('/message/')
+        ref.set("")
+        return

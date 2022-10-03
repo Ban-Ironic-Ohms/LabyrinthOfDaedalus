@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import random
-from helper_functions import article
+from helper_functions import article, pre_print
 
 if TYPE_CHECKING:
     # Anything imported in here may only be used for type hinting.
@@ -74,35 +74,35 @@ class Poi:
 
     def print_poi(self, level=0):
         if level == 0:
-            print(f"{self.name}:")
+            pre_print(f"{self.name}:")
         else:
-            print(f"{' ' * (level * 3 - 1)}- {self.name}")
+            pre_print(f"{' ' * (level * 3 - 1)}- {self.name}")
         for child_poi in self.child_pois:
             child_poi.print_poi(level + 1)
             
     def print_visible(self):
         if (num_of_child_pois := len(self.child_pois)) > 0:
-            print("You see ", end="")
+            pre_print("You see ", end="")
             for ind, item in enumerate(self.child_pois):
                 if ind == num_of_child_pois - 1 and num_of_child_pois > 1:
-                    print(f"and {article(item.name)} {item.name}.")
+                    pre_print(f"and {article(item.name)} {item.name}.")
                     break
                 if num_of_child_pois == 1:
-                    print(f"{article(item.name)} {item.name}. ", end="")
+                    pre_print(f"{article(item.name)} {item.name}. ", end="")
                     break
-                print(f"{article(item.name)} {item.name}, ", end="")
+                pre_print(f"{article(item.name)} {item.name}, ", end="")
 
         if num_of_child_pois <= 1:
-            print("What would you like to do?")
+            pre_print("What would you like to do?")
         else:
-            print("What would you like to look at?")
+            pre_print("What would you like to look at?")
 
     @property
     def descriptions(self):
         return Descriptions(**self.data["descriptions"])
 
     def describe(self):
-        print(self.descriptions.main)
+        pre_print(self.descriptions.main)
 
     def describe_child_pois(self):
         # TODO: Split doors into two types: Connectors and doors.
@@ -112,25 +112,25 @@ class Poi:
         # Let the room creator set a custom "use" command to use a poi (i.e. touch, break, light, etc.)
 
         if (length := len(self.child_pois)) > 0:
-            print("You see ", end="")
+            pre_print("You see ", end="")
         for ind, item in enumerate(self.child_pois):
             to_print = "and " if ind == length - 1 and length > 1 else ""
             to_print += f"{article(item.name)} {item.name}"
             to_print += ".\n" if ind == length - 1 else ","
-            print(to_print, end="")
+            pre_print(to_print, end="")
 
-        print("What would you like to do?" if length <= 1 else
+        pre_print("What would you like to do?" if length <= 1 else
               "What would you like to look at?")
 
     def describe_doors(self):
         ...
         # if len(data["doors"]) > 0:
         #     if len(data["doors"]) == 1:
-        #         print("you see a door:")
+        #         pre_print("you see a door:")
         #     else:
-        #         print("you see doors:")
+        #         pre_print("you see doors:")
         #     for door in data["doors"]:
-        #         print(f" - {door} is {get_door_description(data['doors'][door]['file_name'])}")
+        #         pre_print(f" - {door} is {get_door_description(data['doors'][door]['file_name'])}")
 
     def refresh_child_pois(self):
         self.data["poi"] = [child_poi.data for child_poi in self.child_pois]
@@ -145,12 +145,15 @@ class Poi:
     def print_doors(self):
         if not self.doors:
             return
-
-        print("you see a door:" if len(self.doors) == 1 else "you see doors:")
+        if len(self.doors) == 1:
+            a = "you see a door:"
+        else:
+            a = "you see doors:"
+        pre_print(a)
         for door in self.doors:
-            print(door.get_display())
+            pre_print(door.get_display())
 
-        print()
+        pre_print()
 
 class Room(Poi):
     @property
@@ -167,7 +170,7 @@ class Room(Poi):
         self.database.set_room(self.data)
         
     def print_room(self):
-        print(f"{self.name}:")
+        pre_print(f"{self.name}:")
 
     def get_room_value(self):
         """Returns the value of the room based on all the rarity, value, dmg, and hp values of the items in the room"""
@@ -220,33 +223,33 @@ class Enemy(Entity):
         return self.data["dmg"]
 
     def combat(self, player: Player, input_handler):
-        print(f"The {self.name} noticed you!")
+        pre_print(f"The {self.name} noticed you!")
 
         if "ranged" in self.cls:
-            print(
+            pre_print(
                 f"With its range the {self.name} gets a free attack on you. It {self.descriptions.attack}")
             player.hp -= self.dmg
-            print(f"It hits and deals you {self.dmg} hp")
-            print(f"It has {player.hp} hp left. ({player.hp + self.dmg} - {self.dmg})")
+            pre_print(f"It hits and deals you {self.dmg} hp")
+            pre_print(f"It has {player.hp} hp left. ({player.hp + self.dmg} - {self.dmg})")
 
         while True:
-            print("What do you do?")
+            pre_print("What do you do?")
             input_handler_return_value = input_handler(self, player)
             if input_handler_return_value == "attack":
                 player.attack_enemy(self)
             elif input_handler_return_value in ["run", "flee", "escape", "back", "back down", "back away", "retreat"]:
                 if random.randint(1, 10) > 8:
-                    print("You run away and manage to escape!")
+                    pre_print("You run away and manage to escape!")
                     exit()
                     break
-                print("You attempt to flee the room, but fail to escape!")
+                pre_print("You attempt to flee the room, but fail to escape!")
 
             if self.hp <= 0:
-                print(f"{self.name} has been defeated!")
+                pre_print(f"{self.name} has been defeated!")
                 break
 
-            print(f"\nthe {self.name} attacks. It {self.descriptions.attack}")
+            pre_print(f"\nthe {self.name} attacks. It {self.descriptions.attack}")
             prev_player_hp = player.hp
             player.hp -= self.dmg
-            print(f"It hits and deals you {self.dmg} hp")
-            print(f"You have {player.hp} hp left. ({prev_player_hp} - {self.dmg})")
+            pre_print(f"It hits and deals you {self.dmg} hp")
+            pre_print(f"You have {player.hp} hp left. ({prev_player_hp} - {self.dmg})")
